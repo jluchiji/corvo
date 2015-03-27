@@ -3,7 +3,7 @@
 #include <link.h>
 #include <errno.h>
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
 typedef void (*httprunfunc)(int ssock, const char* querystring);
 
 int
@@ -12,7 +12,7 @@ main(int argc, char ** argv )
 
   // Example of how to use dlopen and dlsym
 
-  // Opening 
+  // Opening
   void * lib = dlopen( "./hello.so", RTLD_LAZY );
 
   if ( lib == NULL ) {
@@ -33,4 +33,3 @@ main(int argc, char ** argv )
   // Call the function
   hello_httprun( 1, "a=b&c=d");
 }
-
