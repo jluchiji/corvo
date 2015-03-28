@@ -117,6 +117,9 @@ void HttpServer::pool_handler(HttpServer* server) {
 
 void HttpServer::handle(HttpRequest *req) {
 
+  Addr_in *ip = req -> ip;
+  char *buffer = inet_ntoa(ip -> sin_addr);
 
-  DBG_INFO("REQUEST RECEIVED\n");
+  DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
+  delete req;
 }

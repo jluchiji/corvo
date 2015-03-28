@@ -10,15 +10,22 @@ class HttpRequest {
 private:
   static pthread_mutex_t mutex;
 
+public:
+
   int              sock;
   HttpServer      *server;
   Addr_in         *ip;
 
-public:
+  char            *verb;
+  char            *path;
+  char            *body;
+  StrMap          *headers;
+
 
   HttpRequest(HttpServer*);
   ~HttpRequest();
 
+  void read();
 
 };
 

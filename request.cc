@@ -36,3 +36,9 @@ HttpRequest::HttpRequest(HttpServer* server) {
 HttpRequest::~HttpRequest() {
   close(this -> sock);
 }
+
+void HttpRequest::read() {
+  /*  */
+
+
+}

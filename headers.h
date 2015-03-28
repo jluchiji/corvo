@@ -1,7 +1,7 @@
 #ifndef _HEADERS_H_
 #define _HEADERS_H_
 
-#define RES_HTTP      "HTTP/1.0 "
+#define RES_HTTP      "HTTP/1.1 "
 
 /* 200 */
 #define RES_200       RES_HTTP "200 OK"
