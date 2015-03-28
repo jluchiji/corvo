@@ -1,22 +1,16 @@
-CXX = g++ -fPIC
-NETLIBS= -lnsl
+CXX      = g++ -fPIC
+LIB      = -lpthread
+DEBUG    = 4
+CFLAGS   = -g
+XFLAGS   = $(CFLAGS) -DDEBUG=$(DEBUG)
 
-all: daytime-server use-dlopen hello.so
+all: http-serve
 
-daytime-server : daytime-server.o
-	$(CXX) -o $@ $@.o $(NETLIBS)
-
-use-dlopen: use-dlopen.o
-	$(CXX) -o $@ $@.o $(NETLIBS) -ldl
-
-hello.so: hello.o
-	ld -G -o hello.so hello.o
+http-serve: main.o request.o response.o server.o
+	$(CXX) -o http-serve *.o $(LIB)
 
 %.o: %.cc
-	@echo 'Building $@ from $<'
-	$(CXX) -o $@ -c -I. $<
+	$(CXX) $(XFLAGS) -o $@ -c -I. $<
 
 clean:
-	rm -f *.o use-dlopen hello.so
-	rm -f *.o daytime-server
-
+	rm -f *.o http-serve

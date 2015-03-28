@@ -2,3 +2,4 @@
 *.so
 daytime-server
 use-dlopen
+http-serve
