@@ -8,6 +8,7 @@
 #include <netdb.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string>
 
 #include "request.h"
 #include "server.h"
@@ -34,11 +35,20 @@ HttpRequest::HttpRequest(HttpServer* server) {
 }
 
 HttpRequest::~HttpRequest() {
-  close(this -> sock);
+  close(sock);
 }
 
 void HttpRequest::read() {
-  /*  */
+  int current;
 
+  /* Read the verb */
+  /*
+ int n;
+ char buffer[1024];
+ while ((n = ::read(sock, buffer, 1024)) > 0) {
+   write(1, buffer, n);
+   memset(buffer, 0, 1024);
+ }
+*/
 
 }

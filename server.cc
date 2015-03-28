@@ -16,6 +16,7 @@
 #include "request.h"
 #include "server.h"
 #include "global.h"
+#include "headers.h"
 #include "trace.h"
 
 HttpServer::HttpServer(HttpServerMode mode) {
@@ -111,15 +112,30 @@ void HttpServer::pool_handler(HttpServer* server) {
   while (1) {
     HttpRequest *req = new HttpRequest(server);
     handle(req);
-    delete req;
   }
 }
 
 void HttpServer::handle(HttpRequest *req) {
 
+  req -> read();
+
   Addr_in *ip = req -> ip;
   char *buffer = inet_ntoa(ip -> sin_addr);
 
   DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
+
+  //dprintf(req -> sock, RES_200 " \n");
+  //dprintf(req -> sock, RES_POW " \n\n");
+  DBG_INFO("SOCKET: %d\n", req -> sock);
+  write(req -> sock, RES_200, strlen(RES_200));
+
+  const char *tmp =
+    "Content-Type: text/html; charset=utf-8\n"
+    "Date: Sat, 28 Mar 2015 01:30:15 GMT\n"
+    "Connection: keep-alive\n\n"
+    "Hello World!";
+
+  write(req -> sock, tmp, strlen(tmp));
+
   delete req;
 }

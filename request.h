@@ -20,8 +20,7 @@ public:
   char            *path;
   char            *body;
   StrMap          *headers;
-
-
+  
   HttpRequest(HttpServer*);
   ~HttpRequest();
 
