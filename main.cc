@@ -4,7 +4,7 @@
 #include "trace.h"
 
 int main(int argc, char *argv[]) {
-
+  
   printf(LGRAY("CORVO - The HTTP Server\n"));
   printf(LGRAY("Copyright (C) Denis Luchkin-Zhou (build %s)\n"), __TIMESTAMP__);
 

@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <pthread.h>
 #include <unistd.h>
@@ -23,6 +24,10 @@ HttpServer::HttpServer(HttpServerMode mode) {
 
 HttpServer::~HttpServer() {
 
+}
+
+void HttpServer::listen() {
+  this -> listen(DEFAULT_PORT);
 }
 
 void HttpServer::listen(int port) {
@@ -60,7 +65,7 @@ void HttpServer::listen(int port) {
   }
 
   /* Ready */
-  DBG_PRINT("Server ready.\n");
+  DBG_PRINT("Server listening on 127.0.0.1:%d\n", port);
 
   /* Start accepting connections */
   switch (mode) {
@@ -97,6 +102,11 @@ void HttpServer::listen(int port) {
 
 }
 
+int HttpServer::getSocket() {
+  return sock;
+}
+
+
 void HttpServer::pool_handler(HttpServer* server) {
   while (1) {
     HttpRequest *req = new HttpRequest(server);
@@ -106,9 +116,7 @@ void HttpServer::pool_handler(HttpServer* server) {
 }
 
 void HttpServer::handle(HttpRequest *req) {
-  DBG_INFO("REQUEST RECEIVED\n");
-}
 
-int HttpServer::getSocket() {
-  return sock;
+
+  DBG_INFO("REQUEST RECEIVED\n");
 }

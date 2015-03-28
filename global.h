@@ -6,6 +6,7 @@
 /* Constants */
 #define SZ_THREAD_POOL 8
 #define SZ_REQ_QUEUE   5
+#define DEFAULT_PORT   8080
 
 /* Type Definitions */
 typedef struct sockaddr_in Addr_in;

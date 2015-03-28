@@ -29,6 +29,7 @@ public:
   HttpServer(HttpServerMode);
   ~HttpServer();
 
+  void listen();
   void listen(int);
 
   int  getSocket();
