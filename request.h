@@ -9,8 +9,8 @@ class HttpServer;
 class HttpRequest {
 private:
   static pthread_mutex_t mutex;
-
-  char* readUntil(char);
+  
+  char* readLine();
 
 public:
 

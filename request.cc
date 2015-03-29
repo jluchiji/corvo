@@ -42,27 +42,40 @@ void HttpRequest::read() {
   int current, count;
 
   /* Read the verb and path */
-  verb = readUntil(' ');
-  path = readUntil(' ');
+  char *meta = readLine();
 
-  /* Read the protocol and discard it */
-  readUntil('\n');
+  /*  */
 
-  DBG_INFO("%s %s HTTP/1.1\n", verb, path);
+  DBG_INFO("%s\n", meta);
+
+  /* Read headers */
+  char *header;
+  while ((header = readLine())) {
+    if (strlen(header) == 0) break;
+    DBG_INFO("%lu: %s\n", strlen(header), header);
+    delete header;
+  }
+
+  /* Read the request body */
+  
+
 
 
   DBG_INFO("Finished reading request.\n")
 }
 
-char* HttpRequest::readUntil(char c) {
-  int count;
-  char current;
+char* HttpRequest::readLine() {
+  int  count;
+  char last, current;
   std::string *content = new std::string();
 
   while ((count = ::read(sock, &current, sizeof(current))) > 0) {
-    if (current == c) break;
+    if (last == '\015' && current == '\012') break;
+    last = current;
     content -> append(&current, 1);
   }
+
+  content -> erase(content -> size() - 1, 1);
 
   char *result = strdup(content -> c_str());
   delete content;
