@@ -39,16 +39,32 @@ HttpRequest::~HttpRequest() {
 }
 
 void HttpRequest::read() {
-  int current;
+  int current, count;
 
-  /* Read the verb */
-  /*
- int n;
- char buffer[1024];
- while ((n = ::read(sock, buffer, 1024)) > 0) {
-   write(1, buffer, n);
-   memset(buffer, 0, 1024);
- }
-*/
+  /* Read the verb and path */
+  verb = readUntil(' ');
+  path = readUntil(' ');
 
+  /* Read the protocol and discard it */
+  readUntil('\n');
+
+  DBG_INFO("%s %s HTTP/1.1\n", verb, path);
+
+
+  DBG_INFO("Finished reading request.\n")
+}
+
+char* HttpRequest::readUntil(char c) {
+  int count;
+  char current;
+  std::string *content = new std::string();
+
+  while ((count = ::read(sock, &current, sizeof(current))) > 0) {
+    if (current == c) break;
+    content -> append(&current, 1);
+  }
+
+  char *result = strdup(content -> c_str());
+  delete content;
+  return result;
 }

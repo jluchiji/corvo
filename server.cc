@@ -136,6 +136,8 @@ void HttpServer::handle(HttpRequest *req) {
     "Hello World!";
 
   write(req -> sock, tmp, strlen(tmp));
+  shutdown(req -> sock, SHUT_WR);
+
 
   delete req;
 }
