@@ -134,6 +134,7 @@ void HttpServer::handle(HttpRequest *req) {
   DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
 
   response -> setStatus(RES_200);
+  response -> setHeader(RES_POW);
   response -> setHeader("Date", "Sat, 28 Mar 2015 01:30:15 GMT");
   response -> setHeader("Content-Type", "text/html");
   response -> write("Hello World!", 14);
