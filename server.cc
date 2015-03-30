@@ -114,21 +114,21 @@ void HttpServer::pool_handler(HttpServer* server) {
   }
 }
 
-void HttpServer::handle(HttpRequest *req) {
+void HttpServer::handle(HttpRequest *request) {
+
+  /* Create the response object */
+  HttpResponse *response = new HttpResponse(request);
 
   /* Read request data and look for errors */
-  if (req -> read()) {
-    write(req -> sock, "HTTP/1.1 400 Bad Request", 24);
-    shutdown(req -> sock, SHUT_RDWR);
-    delete req;
+  if (request -> read()) {
+    response -> setStatus(RES_400);
+    response -> send();
+    delete request;
     return;
   }
 
-  /* Create the response object */
-  HttpResponse *response = new HttpResponse(req);
-
   /* Get the client IP address for logging purposes */
-  Addr_in *ip = req -> ip;
+  Addr_in *ip = request -> ip;
   char *buffer = inet_ntoa(ip -> sin_addr);
 
   DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
@@ -141,5 +141,5 @@ void HttpServer::handle(HttpRequest *req) {
 
   response -> send();
 
-  delete req;
+  delete request;
 }

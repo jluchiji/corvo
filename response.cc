@@ -42,9 +42,10 @@ void
 HttpResponse::write(const char *buffer, size_t count) {
   /* Ensure that body has sufficient capacity */
   if (bodyCapacity - bodyLength < count) {
-    int factor = (int)ceil(log2((double)((bodyLength + count) / SZ_LINE_BUFFER)));
-    body = (char*) realloc(body, SZ_LINE_BUFFER * factor);
-    bodyCapacity = SZ_LINE_BUFFER * factor;
+    int sz = SZ_LINE_BUFFER;
+    while (sz <= bodyLength + count) { sz *= 2; }
+    body = (char*) realloc(body, sz);
+    bodyCapacity = sz;
   }
 
   /* Copy over the buffer */
