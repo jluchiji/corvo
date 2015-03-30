@@ -43,7 +43,6 @@ HttpRequest::~HttpRequest() {
   if (body)  { delete body;  }
   if (query) { delete query; }
 
-  close(sock);
 }
 
 int HttpRequest::read() {

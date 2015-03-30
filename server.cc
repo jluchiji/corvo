@@ -118,11 +118,14 @@ void HttpServer::handle(HttpRequest *req) {
 
   /* Read request data and look for errors */
   if (req -> read()) {
-    write(req -> sock, RES_400, strlen(RES_400));
+    write(req -> sock, "HTTP/1.1 400 Bad Request", 24);
     shutdown(req -> sock, SHUT_RDWR);
     delete req;
     return;
   }
+
+  /* Create the response object */
+  HttpResponse *response = new HttpResponse(req);
 
   /* Get the client IP address for logging purposes */
   Addr_in *ip = req -> ip;
@@ -130,17 +133,12 @@ void HttpServer::handle(HttpRequest *req) {
 
   DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
 
-  write(req -> sock, RES_200, strlen(RES_200));
+  response -> setStatus(RES_200);
+  response -> setHeader("Date", "Sat, 28 Mar 2015 01:30:15 GMT");
+  response -> setHeader("Content-Type", "text/html");
+  response -> write("Hello World!", 14);
 
-  const char *tmp =
-    "Content-Type: text/html; charset=utf-8\n"
-    "Date: Sat, 28 Mar 2015 01:30:15 GMT\n"
-    "Content-Length: 12\n\n"
-    "Hello World!";
-
-  write(req -> sock, tmp, strlen(tmp));
-  shutdown(req -> sock, SHUT_WR);
-
+  response -> send();
 
   delete req;
 }

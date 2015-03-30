@@ -26,8 +26,8 @@ private:
   static void handle(HttpRequest*);
 
 public:
-  HttpServer(HttpServerMode);
-  ~HttpServer();
+       HttpServer(HttpServerMode);
+       ~HttpServer();
 
   void listen();
   void listen(int);
