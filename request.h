@@ -10,7 +10,8 @@ class HttpRequest {
 private:
   static pthread_mutex_t mutex;
 
-  char* readLine();
+  int    read_meta();
+  int    read_body();
 
 public:
 
@@ -21,12 +22,13 @@ public:
   char            *verb;
   char            *path;
   char            *body;
-  StrMap          *headers;
+  char            *query;
+  StrMap           headers;
 
   HttpRequest(HttpServer*);
   ~HttpRequest();
 
-  void read();
+  int    read();
 
 };
 

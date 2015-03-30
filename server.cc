@@ -107,7 +107,6 @@ int HttpServer::getSocket() {
   return sock;
 }
 
-
 void HttpServer::pool_handler(HttpServer* server) {
   while (1) {
     HttpRequest *req = new HttpRequest(server);
@@ -117,22 +116,26 @@ void HttpServer::pool_handler(HttpServer* server) {
 
 void HttpServer::handle(HttpRequest *req) {
 
-  req -> read();
+  /* Read request data and look for errors */
+  if (req -> read()) {
+    write(req -> sock, RES_400, strlen(RES_400));
+    shutdown(req -> sock, SHUT_RDWR);
+    delete req;
+    return;
+  }
 
+  /* Get the client IP address for logging purposes */
   Addr_in *ip = req -> ip;
   char *buffer = inet_ntoa(ip -> sin_addr);
 
   DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
 
-  //dprintf(req -> sock, RES_200 " \n");
-  //dprintf(req -> sock, RES_POW " \n\n");
-  DBG_INFO("SOCKET: %d\n", req -> sock);
   write(req -> sock, RES_200, strlen(RES_200));
 
   const char *tmp =
     "Content-Type: text/html; charset=utf-8\n"
     "Date: Sat, 28 Mar 2015 01:30:15 GMT\n"
-    "Connection: keep-alive\n\n"
+    "Content-Length: 12\n\n"
     "Hello World!";
 
   write(req -> sock, tmp, strlen(tmp));

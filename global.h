@@ -26,4 +26,17 @@ typedef void* (*ThreadHandler)(void*);
 typedef std::pair<const char*, char*> StrPair;
 typedef std::map<const char*, char*, StringComp> StrMap;
 
+/* Character Constants */
+#define ASCII_CR  '\015'
+#define ASCII_LF  '\012'
+#define ASCII_WS  '\040'
+#define ASCII_TAB '\011'
+
+/* Macros */
+#define EITHER(X, Y) ((X) ? (X) : (Y))
+#define LWS(C) ((C) == ASCII_WS || (C) == ASCII_TAB)
+
+#define MAX(X, Y) ((X) > (Y) ? (X) : (Y))
+#define MIN(X, Y) ((X) < (Y) ? (X) : (Y))
+
 #endif

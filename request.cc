@@ -36,22 +36,112 @@ HttpRequest::HttpRequest(HttpServer* server) {
 }
 
 HttpRequest::~HttpRequest() {
+  delete ip;
+
+  if (verb)  { delete verb;  }
+  if (path)  { delete path;  }
+  if (body)  { delete body;  }
+  if (query) { delete query; }
+
   close(sock);
 }
 
-void HttpRequest::read() {
-  char buffer[SZ_LINE_BUFFER];
+int HttpRequest::read() {
+  if (read_meta() || read_body()) {
+    DBG_ERR("Malformed request detected.\n");
+    return 1;
+  }
+  DBG_INFO("Finished reading request.\n");
+  return 0;
+}
+
+int  HttpRequest::read_meta() {
+  char  buffer[SZ_LINE_BUFFER];
+  char *start, *end;
 
   /* Read metadata */
   Util::readline(sock, buffer, SZ_LINE_BUFFER);
-  DBG_INFO("%s\n", buffer);
+
+  /* Get the verb */
+  start = buffer;
+  end   = strstr(start, " ");
+  if (!end) { return 1; }
+  verb  = strndup(start, end - start);
+
+  /* Get the path */
+  start = end + 1;
+  end   = EITHER(strstr(start, "?"), strstr(start, " "));
+  if (!end) { return 1; }
+  path  = strndup(start, end - start);
+
+  /* Get the query string (if present) */
+  if (*end == '?') {
+    start = end + 1;
+    end   = strstr(start, " ");
+    if (!end) { return 1; }
+    query = strndup(start, end - start);
+  } else { query = NULL; }
+
+  /* Discard the protocol version */
+
+  /* Log the request info */
+  DBG_VERBOSE("Verb:   %s\n", verb);
+  DBG_VERBOSE("Path:   %s\n", path);
+  DBG_VERBOSE("Query:  %s\n", query);
 
   /* Read headers */
   while (Util::readline(sock, buffer, SZ_LINE_BUFFER)) {
-    DBG_INFO("%s\n", buffer);
+    char *key   = NULL,
+         *value = NULL;
+
+    /* Read the header name */
+    start = buffer;
+    end   = strstr(start, ":");
+    if (!end) { return 1; }
+    key   = strndup(start, end - start);
+
+    /* Skip LWS characters per HTTP/1.1 SPEC section 4.2 */
+    end += 1;
+    while (LWS(*end)) { end++; }
+
+    /* Read the header value */
+    start = end;
+    value = strdup(start);
+
+    /* Insert the header into the request object */
+    if (key && value) {
+      headers[key] = value;
+      DBG_VERBOSE("Header: (%s) %s\n", key, value);
+    }
   }
 
-  /*  */
+  /* All good */
+  return 0;
+}
 
-  DBG_INFO("Finished reading request.\n")
+int  HttpRequest::read_body() {
+  char  buffer[SZ_LINE_BUFFER];
+  char *start, *end;
+
+  /* Save content length for later use */
+  char *strLen      = headers["Content-Length"];
+  int contentLength = -1;
+  if (strLen) { contentLength = atoi(strLen); }
+
+  /* Read request body */
+  if (contentLength > 0) {
+    int total = 0;
+    std::string *tmp = new std::string();
+    while (1) {
+      int count = ::read(sock, buffer, SZ_LINE_BUFFER);
+      tmp -> append(buffer, MIN(count, contentLength - total));
+      total += count;
+      if (total >= contentLength) { break; }
+    }
+    body = strdup(tmp -> c_str());
+    delete tmp;
+    DBG_VERBOSE("Body:   %s\n", body);
+  } else { body = NULL; }
+
+  return 0;
 }

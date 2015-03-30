@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <stdio.h>
+#include "global.h"
 #include "util.h"
 
 ssize_t
