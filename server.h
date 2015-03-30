@@ -4,6 +4,7 @@
 #include "response.h"
 #include "request.h"
 #include "global.h"
+#include <vector>
 
 /* HTTP Server Operation Mode */
 enum HttpServerMode {
@@ -13,6 +14,17 @@ enum HttpServerMode {
   THREAD
 };
 
+/* HTTP Request Handler Function */
+typedef void (*HttpHandlerFunc)(HttpRequest*, HttpResponse*);
+
+/* HTTP Request Handler */
+typedef struct {
+  char             *verb;
+  char             *path;
+  HttpHandlerFunc   handler;
+} HttpHandler;
+typedef std::vector<HttpHandler*> HandlerMap;
+
 /* HTTP Server Class */
 class HttpServer {
 private:
@@ -21,6 +33,8 @@ private:
   pthread_mutex_t      mutex;
 
   int                  sock;
+
+  HandlerMap           handlers;
 
   static void pool_handler(HttpServer*);
   static void handle(HttpRequest*);
@@ -32,7 +46,15 @@ public:
   void listen();
   void listen(int);
 
+  void mount(const char*, const char*, HttpHandlerFunc);
+
   int  getSocket();
+
+
+  static
+  void serve(HttpRequest*, HttpResponse*) {
+    // TODO do something like express.static()
+  }
 };
 
 #endif

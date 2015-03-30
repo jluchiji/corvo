@@ -10,7 +10,7 @@
 
 HttpResponse::HttpResponse(HttpRequest *request) {
   this -> request = request;
-  this -> setStatus(RES_400);
+  this -> setStatus(RES_501);
 
   bodyLength   = 0;
   bodyCapacity = SZ_LINE_BUFFER;

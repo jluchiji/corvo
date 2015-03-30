@@ -143,3 +143,18 @@ void HttpServer::handle(HttpRequest *request) {
 
   delete request;
 }
+
+void HttpServer::mount(const char      *verb,
+                       const char      *path,
+                       HttpHandlerFunc  handler) {
+  HttpHandler *mapping = new HttpHandler();
+  mapping -> verb    = strdup(verb);
+  mapping -> path    = strdup(path); // TODO Process patterns
+  mapping -> handler = handler;
+
+  handlers.push_back(mapping);
+}
+
+void HttpServer::serve(HttpRequest *req, HttpResponse *res) {
+  
+}
