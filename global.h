@@ -16,6 +16,7 @@ struct StringComp :
 /* Constants */
 #define SZ_THREAD_POOL 8
 #define SZ_REQ_QUEUE   5
+#define SZ_LINE_BUFFER 1024
 #define DEFAULT_PORT   8080
 
 /* Type Definitions */

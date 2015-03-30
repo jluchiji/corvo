@@ -14,6 +14,7 @@
 #include "server.h"
 #include "global.h"
 #include "trace.h"
+#include "util.h"
 
 pthread_mutex_t HttpRequest::mutex;
 
@@ -39,45 +40,18 @@ HttpRequest::~HttpRequest() {
 }
 
 void HttpRequest::read() {
-  int current, count;
+  char buffer[SZ_LINE_BUFFER];
 
-  /* Read the verb and path */
-  char *meta = readLine();
+  /* Read metadata */
+  Util::readline(sock, buffer, SZ_LINE_BUFFER);
+  DBG_INFO("%s\n", buffer);
+
+  /* Read headers */
+  while (Util::readline(sock, buffer, SZ_LINE_BUFFER)) {
+    DBG_INFO("%s\n", buffer);
+  }
 
   /*  */
 
-  DBG_INFO("%s\n", meta);
-
-  /* Read headers */
-  char *header;
-  while ((header = readLine())) {
-    if (strlen(header) == 0) break;
-    DBG_INFO("%lu: %s\n", strlen(header), header);
-    delete header;
-  }
-
-  /* Read the request body */
-  
-
-
-
   DBG_INFO("Finished reading request.\n")
-}
-
-char* HttpRequest::readLine() {
-  int  count;
-  char last, current;
-  std::string *content = new std::string();
-
-  while ((count = ::read(sock, &current, sizeof(current))) > 0) {
-    if (last == '\015' && current == '\012') break;
-    last = current;
-    content -> append(&current, 1);
-  }
-
-  content -> erase(content -> size() - 1, 1);
-
-  char *result = strdup(content -> c_str());
-  delete content;
-  return result;
 }
