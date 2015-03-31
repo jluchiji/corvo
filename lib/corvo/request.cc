@@ -1,3 +1,12 @@
+// ------------------------------------------------------------------------- //
+//                                                                           //
+// CS252 Lab05 - HTTP Server                                                 //
+// Copyright © 2015 Denis Luchkin-Zhou                                       //
+//                                                                           //
+// request.cc                                                                //
+// Contains operations for processing HTTP request messages.                 //
+//                                                                           //
+// ------------------------------------------------------------------------- //
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -16,19 +25,27 @@
 #include "include/global.h"
 #include "include/trace.h"
 
+// Forward declarations
 pthread_mutex_t HttpRequest::mutex;
 
+// ------------------------------------------------------------------------- //
+// Constructor. Takes an instance of HttpServer that this request belongs    //
+// to.                                                                       //
+// ------------------------------------------------------------------------- //
 HttpRequest::HttpRequest(HttpServer* server) {
-
+  // Capture the client address
   Addr_in address;
   int len = sizeof(address);
 
+  // Keep a reference to the server
   this -> server = server;
 
+  // Wait for incoming connection
   pthread_mutex_lock(&HttpRequest::mutex);
   sock = accept(server -> getSocket(), (Addr*)&address, (socklen_t*)&len);
   pthread_mutex_unlock(&HttpRequest::mutex);
 
+  // 
   if (sock < 0) { COMPLAIN("accept: %s", strerror(errno)); }
 
   ip = new Addr_in();

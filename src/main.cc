@@ -24,9 +24,9 @@ int main(int argc, char *argv[]) {
 
   HttpServer *server = new HttpServer(NONE);
 
-  server -> route("*", "/*", &serve);
-  server -> route("*", "!!error/405", &error);
-  server -> route("*", "!!error/404", &error);
+  server -> route("GET", "/*", &serve);
+  //server -> route("*", "!!error/405", &error);
+  //server -> route("*", "!!error/404", &error);
   server -> listen(8080);
 
 }
