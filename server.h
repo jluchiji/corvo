@@ -52,9 +52,7 @@ public:
 
 
   static
-  void serve(HttpRequest*, HttpResponse*) {
-    // TODO do something like express.static()
-  }
+  void serve(HttpRequest*, HttpResponse*);
 };
 
 #endif
