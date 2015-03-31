@@ -54,6 +54,11 @@ HttpResponse::write(const char *buffer, size_t count) {
 }
 
 void
+HttpResponse::write(const char *buffer) {
+  write(buffer, strlen(buffer));
+}
+
+void
 HttpResponse::send() {
   int sock = request -> sock;
 

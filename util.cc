@@ -1,6 +1,11 @@
 #include <unistd.h>
 #include <stdio.h>
+#include <string>
 #include "global.h"
+#include "string.h"
+#include "errno.h"
+#include "trace.h"
+#include "path.h"
 #include "util.h"
 
 ssize_t
@@ -44,4 +49,31 @@ Util::readline(int fd, char *buffer, size_t n) {
   /* Null terminate and return */
   *buf = 0;
   return total;
+}
+
+Regex*
+Util::toRegex(const char *path) {
+  if (!path) return NULL;
+  std::string *result = new std::string(path);
+
+  Path::replace(result, ".", "\\.");
+  Path::replace(result, "/", "\\/");
+  Path::replace(result, "*", ".+");
+  Path::replace(result, "?", ".");
+
+  result -> insert(0, "^");
+  result -> push_back('$');
+
+  Regex *regex = new Regex();
+
+  int      fail  = regcomp(regex, result -> c_str(), REG_EXTENDED|REG_NOSUB);
+  if (fail) {
+    COMPLAIN("%s: %s", result -> c_str(), strerror(errno));
+    delete result;
+    return NULL;
+  }
+
+  DBG_VERBOSE("Regex: %s\n", result -> c_str());
+  delete result;
+  return regex;
 }

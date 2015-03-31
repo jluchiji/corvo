@@ -20,7 +20,7 @@ typedef void (*HttpHandlerFunc)(HttpRequest*, HttpResponse*);
 /* HTTP Request Handler */
 typedef struct {
   char             *verb;
-  char             *path;
+  Regex            *regex;
   HttpHandlerFunc   handler;
 } HttpHandler;
 typedef std::vector<HttpHandler*> HandlerMap;
@@ -46,7 +46,7 @@ public:
   void listen();
   void listen(int);
 
-  void mount(const char*, const char*, HttpHandlerFunc);
+  void route(const char*, const char*, HttpHandlerFunc);
 
   int  getSocket();
 

@@ -4,7 +4,7 @@
 #include "trace.h"
 
 int main(int argc, char *argv[]) {
-  
+
   printf(LGRAY("CORVO - The HTTP Server\n"));
   printf(LGRAY("Copyright (C) Denis Luchkin-Zhou (build %s)\n"), __TIMESTAMP__);
 
@@ -20,6 +20,8 @@ int main(int argc, char *argv[]) {
   printf("\n\n");
 
   HttpServer *server = new HttpServer(NONE);
+
+  server -> route("GET", "/cgi-bin/*", HttpServer::serve);
   server -> listen(8080);
 
 }

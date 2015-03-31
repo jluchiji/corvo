@@ -3,6 +3,7 @@
 
 #include <sys/socket.h>
 #include <string.h>
+#include <regex.h>
 #include <map>
 
 /* String comparator */
@@ -25,6 +26,10 @@ typedef struct sockaddr    Addr;
 typedef void* (*ThreadHandler)(void*);
 typedef std::pair<const char*, char*> StrPair;
 typedef std::map<const char*, char*, StringComp> StrMap;
+
+typedef regex_t Regex;
+typedef struct dirent DirEntry;
+typedef struct stat   DirStat;
 
 /* Character Constants */
 #define ASCII_CR  '\015'

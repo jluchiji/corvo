@@ -26,6 +26,7 @@ public:
   void setHeader(const char*, const char*);
 
   void write(const char*, size_t);
+  void write(const char*);
   void send();
 };
 

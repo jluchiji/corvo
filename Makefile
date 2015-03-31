@@ -6,6 +6,9 @@ XFLAGS   = $(CFLAGS) -DDEBUG=$(DEBUG)
 
 all: http-serve
 
+dev: clean http-serve
+	./http-serve
+
 http-serve: main.o request.o response.o server.o util.o path.o puppet.o plumber.o
 	$(CXX) -o http-serve *.o $(LIB)
 

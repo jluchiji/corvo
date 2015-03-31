@@ -18,6 +18,7 @@
 #include "global.h"
 #include "headers.h"
 #include "trace.h"
+#include "util.h"
 
 HttpServer::HttpServer(HttpServerMode mode) {
   this -> mode = mode;
@@ -116,7 +117,13 @@ void HttpServer::pool_handler(HttpServer* server) {
 
 void HttpServer::handle(HttpRequest *request) {
 
+  /* Get the client IP address for logging purposes */
+  Addr_in *ip = request -> ip;
+  char *buffer = inet_ntoa(ip -> sin_addr);
+  DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
+
   /* Create the response object */
+  HttpServer   *server   = request -> server;
   HttpResponse *response = new HttpResponse(request);
 
   /* Read request data and look for errors */
@@ -127,34 +134,50 @@ void HttpServer::handle(HttpRequest *request) {
     return;
   }
 
-  /* Get the client IP address for logging purposes */
-  Addr_in *ip = request -> ip;
-  char *buffer = inet_ntoa(ip -> sin_addr);
+  /* Find the first matching route handler */
+  HttpHandlerFunc handler = NULL;
+  HandlerMap::iterator it = server -> handlers.begin();
+  for (; it != server -> handlers.end(); ++it) {
+    /* Match path regex */
+    regmatch_t m;
+    if (!regexec((*it) -> regex, request -> path, 1, &m, 0)) {
+      handler = (*it) -> handler;
+      break;
+    }
+  }
 
-  DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
-
-  response -> setStatus(RES_200);
-  response -> setHeader(RES_POW);
-  response -> setHeader("Date", "Sat, 28 Mar 2015 01:30:15 GMT");
-  response -> setHeader("Content-Type", "text/html");
-  response -> write("Hello World!", 14);
-
-  response -> send();
+  /* If handler was not found...that is a 405 */
+  if (!handler) {
+    response -> setStatus(RES_405);
+    response -> setHeader(RES_POW);
+    response -> send();
+    return;
+  } else {
+    (*handler)(request, response);
+  }
 
   delete request;
+  delete response;
 }
 
-void HttpServer::mount(const char      *verb,
+void HttpServer::route(const char      *verb,
                        const char      *path,
                        HttpHandlerFunc  handler) {
+  /*  */
   HttpHandler *mapping = new HttpHandler();
   mapping -> verb    = strdup(verb);
-  mapping -> path    = strdup(path); // TODO Process patterns
+  mapping -> regex   = Util::toRegex(path);
   mapping -> handler = handler;
 
   handlers.push_back(mapping);
 }
 
-void HttpServer::serve(HttpRequest *req, HttpResponse *res) {
-  
+void HttpServer::serve(HttpRequest *request, HttpResponse *response) {
+  response -> setStatus(RES_200);
+  response -> setHeader(RES_POW);
+  response -> setHeader("Date", "Sat, 28 Mar 2015 01:30:15 GMT");
+  response -> setHeader("Content-Type", "text/html");
+  response -> write("Hello World!", 12);
+
+  response -> send();
 }
