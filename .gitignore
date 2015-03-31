@@ -3,4 +3,4 @@
 daytime-server
 use-dlopen
 http-serve
-bin/*.a
+*.a
