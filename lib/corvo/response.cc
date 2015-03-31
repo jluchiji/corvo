@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <cmath>
 
@@ -7,6 +8,7 @@
 #include "include/corvo/request.h"
 #include "include/corvo/headers.h"
 #include "include/global.h"
+#include "include/trace.h"
 
 HttpResponse::HttpResponse(HttpRequest *request) {
   this -> request = request;
@@ -39,6 +41,21 @@ HttpResponse::setHeader(const char *name, const char *value) {
 }
 
 void
+HttpResponse::write(const unsigned char *buffer, size_t count) {
+  /* Ensure that body has sufficient capacity */
+  if (bodyCapacity - bodyLength < count) {
+    int sz = SZ_LINE_BUFFER;
+    while (sz <= bodyLength + count) { sz *= 2; }
+    body = (char*) realloc(body, sz);
+    bodyCapacity = sz;
+  }
+
+  /* Copy over the buffer */
+  memcpy(body + bodyLength, buffer, count);
+  bodyLength += count;
+}
+
+void
 HttpResponse::write(const char *buffer, size_t count) {
   /* Ensure that body has sufficient capacity */
   if (bodyCapacity - bodyLength < count) {
@@ -67,8 +84,11 @@ HttpResponse::send() {
 
   /* Print headers */
   for (StrMap::iterator it = headers.begin(); it != headers.end(); ++it) {
+    DBG_VERBOSE("%s: %s\n", it -> first, it -> second);
     dprintf(sock, "%s: %s\r\n", it -> first, it -> second);
+    DBG_VERBOSE("%s: %s\n", it -> first, it -> second);
   }
+  DBG_VERBOSE("SEND RESPONSE\n");
 
   /* Add Content-Length if necessary */
   if (bodyLength > 0) {

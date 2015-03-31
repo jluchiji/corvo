@@ -1,7 +1,15 @@
 #include <stdio.h>
 
+#include "include/corvo/request.h"
+#include "include/corvo/response.h"
 #include "include/corvo/server.h"
+#include "include/corvo/headers.h"
 #include "include/trace.h"
+
+#include "embed/405.h"
+
+void serve(HttpRequest*, HttpResponse*);
+void error(HttpRequest*, HttpResponse*);
 
 int main(int argc, char *argv[]) {
 
@@ -21,7 +29,22 @@ int main(int argc, char *argv[]) {
 
   HttpServer *server = new HttpServer(NONE);
 
-  server -> route("GET", "/cgi-bin/*", HttpServer::serve);
+  server -> route("POST", "/cgi-bin/*", &serve);
+  server -> route("*", "!!error/405", &error);
   server -> listen(8080);
 
+}
+
+void serve(HttpRequest *request, HttpResponse *response) {
+  response -> setStatus(RES_200);
+  response -> setHeader(RES_POW);
+  response -> setHeader("Date", "Sat, 28 Mar 2015 01:30:15 GMT");
+  response -> setHeader("Content-Type", "text/html");
+  response -> write("Hello World!", 12);
+}
+
+
+
+void error(HttpRequest *request, HttpResponse *response) {
+  response -> write(__405_res, __405_res_len);
 }

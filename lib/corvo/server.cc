@@ -22,6 +22,7 @@
 
 HttpServer::HttpServer(HttpServerMode mode) {
   this -> mode = mode;
+  this -> route("*", "!!error/*", HttpServer::error);
 }
 
 HttpServer::~HttpServer() {
@@ -115,16 +116,28 @@ void HttpServer::pool_handler(HttpServer* server) {
   }
 }
 
-void HttpServer::handle(HttpRequest *request) {
+HttpHandlerFunc
+HttpServer::find_handler(const char *verb, const char *path) {
+  HttpHandlerFunc handler = NULL;
+  HandlerMap::iterator it = handlers.begin();
+  for (; it !=  handlers.end(); ++it) {
+    /* Match path regex */
+    regmatch_t m;
+    if (!regexec((*it) -> regex, path, 1, &m, 0) &&
+       (!strcmp((*it) -> verb, "*") || strstr((*it) -> verb, verb))) {
+      handler = (*it) -> handler;
+      break;
+    }
+  }
+  return handler;
+}
 
-  /* Get the client IP address for logging purposes */
-  Addr_in *ip = request -> ip;
-  char *buffer = inet_ntoa(ip -> sin_addr);
-  DBG_INFO("REQUEST RECEIVED: %s\n", buffer);
+void HttpServer::handle(HttpRequest *request) {
 
   /* Create the response object */
   HttpServer   *server   = request -> server;
   HttpResponse *response = new HttpResponse(request);
+  response -> setHeader(RES_POW); // Default header
 
   /* Read request data and look for errors */
   if (request -> read()) {
@@ -134,28 +147,24 @@ void HttpServer::handle(HttpRequest *request) {
     return;
   }
 
+  /* Get the client IP address for logging purposes */
+  Addr_in *ip = request -> ip;
+  char *buffer = inet_ntoa(ip -> sin_addr);
+  DBG_INFO("[%s] %s %s\n", buffer, request -> verb, request -> path);
+
   /* Find the first matching route handler */
-  HttpHandlerFunc handler = NULL;
-  HandlerMap::iterator it = server -> handlers.begin();
-  for (; it != server -> handlers.end(); ++it) {
-    /* Match path regex */
-    regmatch_t m;
-    if (!regexec((*it) -> regex, request -> path, 1, &m, 0)) {
-      handler = (*it) -> handler;
-      break;
-    }
-  }
+  HttpHandlerFunc handler = request -> server -> find_handler(request -> verb, request -> path);
 
   /* If handler was not found...that is a 405 */
   if (!handler) {
     response -> setStatus(RES_405);
-    response -> setHeader(RES_POW);
-    response -> send();
-    return;
+    HttpHandlerFunc errHandler = request -> server -> find_handler("*", "!!error/405");
+    (*errHandler)(request, response);
   } else {
     (*handler)(request, response);
   }
 
+  response -> send();
   delete request;
   delete response;
 }
@@ -169,15 +178,10 @@ void HttpServer::route(const char      *verb,
   mapping -> regex   = Util::toRegex(path);
   mapping -> handler = handler;
 
-  handlers.push_back(mapping);
+  handlers.push_front(mapping);
 }
 
-void HttpServer::serve(HttpRequest *request, HttpResponse *response) {
-  response -> setStatus(RES_200);
-  response -> setHeader(RES_POW);
-  response -> setHeader("Date", "Sat, 28 Mar 2015 01:30:15 GMT");
-  response -> setHeader("Content-Type", "text/html");
-  response -> write("Hello World!", 12);
-
-  response -> send();
+void HttpServer::error(HttpRequest  *request,
+                       HttpResponse *response) {
+  response -> write(response -> statusMessage);
 }

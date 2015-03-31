@@ -4,7 +4,10 @@
 #include "include/corvo/response.h"
 #include "include/corvo/request.h"
 #include "include/global.h"
-#include <vector>
+#include <list>
+
+#define SZ_ERR_ROUTE  12
+#define FMT_ERR_ROUTE "!!error/%d"
 
 /* HTTP Server Operation Mode */
 enum HttpServerMode {
@@ -23,7 +26,7 @@ typedef struct {
   Regex            *regex;
   HttpHandlerFunc   handler;
 } HttpHandler;
-typedef std::vector<HttpHandler*> HandlerMap;
+typedef std::list<HttpHandler*> HandlerMap;
 
 /* HTTP Server Class */
 class HttpServer {
@@ -36,8 +39,11 @@ private:
 
   HandlerMap           handlers;
 
+  HttpHandlerFunc find_handler(const char*, const char*);
+
   static void pool_handler(HttpServer*);
   static void handle(HttpRequest*);
+
 
 public:
        HttpServer(HttpServerMode);
@@ -52,7 +58,7 @@ public:
 
 
   static
-  void serve(HttpRequest*, HttpResponse*);
+  void error(HttpRequest*, HttpResponse*);
 };
 
 #endif

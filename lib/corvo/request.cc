@@ -50,7 +50,7 @@ int HttpRequest::read() {
     DBG_ERR("Malformed request detected.\n");
     return 1;
   }
-  DBG_INFO("Finished reading request.\n");
+  DBG_VERBOSE("Finished reading request.\n");
   return 0;
 }
 
@@ -81,13 +81,6 @@ int  HttpRequest::read_meta() {
     query = strndup(start, end - start);
   } else { query = NULL; }
 
-  /* Discard the protocol version */
-
-  /* Log the request info */
-  DBG_VERBOSE("Verb:   %s\n", verb);
-  DBG_VERBOSE("Path:   %s\n", path);
-  DBG_VERBOSE("Query:  %s\n", query);
-
   /* Read headers */
   while (Util::readline(sock, buffer, SZ_LINE_BUFFER)) {
     char *key   = NULL,
@@ -110,7 +103,7 @@ int  HttpRequest::read_meta() {
     /* Insert the header into the request object */
     if (key && value) {
       headers[key] = value;
-      DBG_VERBOSE("Header: (%s) %s\n", key, value);
+      DBG_VERBOSE("%s: %s\n", key, value);
     }
   }
 

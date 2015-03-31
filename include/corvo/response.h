@@ -7,17 +7,16 @@
 class HttpResponse {
 private:
 
-  HttpRequest     *request;
   StrMap           headers;
-
-  int              statusCode;
-  const char      *statusMessage;
 
   int              bodyLength;
   int              bodyCapacity;
   char            *body;
 
 public:
+  HttpRequest     *request;
+  int              statusCode;
+  const char      *statusMessage;
 
   HttpResponse(HttpRequest*);
   ~HttpResponse();
@@ -25,8 +24,10 @@ public:
   void setStatus(int, const char*);
   void setHeader(const char*, const char*);
 
+  void write(const unsigned char*, size_t);
   void write(const char*, size_t);
   void write(const char*);
+
   void send();
 };
 
