@@ -12,13 +12,13 @@
 #include <errno.h>
 #include <stdio.h>
 
-#include "response.h"
-#include "request.h"
-#include "server.h"
-#include "global.h"
-#include "headers.h"
-#include "trace.h"
-#include "util.h"
+#include "include/corvo/response.h"
+#include "include/corvo/request.h"
+#include "include/corvo/headers.h"
+#include "include/corvo/server.h"
+#include "include/corvo/util.h"
+#include "include/global.h"
+#include "include/trace.h"
 
 HttpServer::HttpServer(HttpServerMode mode) {
   this -> mode = mode;

@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "server.h"
-#include "trace.h"
+#include "include/corvo/server.h"
+#include "include/trace.h"
 
 int main(int argc, char *argv[]) {
 

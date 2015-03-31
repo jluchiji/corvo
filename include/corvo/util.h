@@ -1,6 +1,8 @@
 #ifndef _UTIL_H_
 #define _UTIL_H_
 
+#include "include/global.h"
+
 #define RGX_SEGMENT "([^/]+)"
 
 class Util {

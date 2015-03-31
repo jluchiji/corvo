@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <cmath>
 
-#include "response.h"
-#include "request.h"
-#include "headers.h"
-#include "global.h"
+#include "include/corvo/response.h"
+#include "include/corvo/request.h"
+#include "include/corvo/headers.h"
+#include "include/global.h"
 
 HttpResponse::HttpResponse(HttpRequest *request) {
   this -> request = request;

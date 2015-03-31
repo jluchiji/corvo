@@ -1,19 +1,28 @@
 CXX      = g++ -fPIC
-LIB      = -lpthread
 DEBUG    = 4
 CFLAGS   = -g
 XFLAGS   = $(CFLAGS) -DDEBUG=$(DEBUG)
 
+TOP     := $(shell pwd)
+LIB     := $(TOP)/lib
+SRC     := $(TOP)/src
+INCLUDE := $(TOP)/include
+
 all: http-serve
 
-dev: clean http-serve
-	./http-serve
+http-serve: bin/libbush.a bin/libcorvo.a bin/main.o
+	$(CXX) -o $@ bin/main.o bin/*.a
 
-http-serve: main.o request.o response.o server.o util.o path.o puppet.o plumber.o
-	$(CXX) -o http-serve *.o $(LIB)
+bin/%.o: src/%.cc
+	$(CXX) $(XFLAGS) -lpthread -o $@ -c -I$(TOP) $<
 
-%.o: %.cc
-	$(CXX) $(XFLAGS) -o $@ -c -I. $<
+bin/libbush.a:
+	make -C $(LIB)/bush CXX="$(CXX)" XFLAGS="$(XFLAGS)" DEBUG=$(DEBUG) TOP=$(TOP)
+
+bin/libcorvo.a:
+	make -C $(LIB)/corvo CXX="$(CXX)" XFLAGS="$(XFLAGS)" DEBUG=$(DEBUG) TOP=$(TOP)
 
 clean:
-	rm -f *.o http-serve
+	rm bin/*
+	make clean -C $(LIB)/bush
+	make clean -C $(LIB)/corvo

@@ -2,7 +2,7 @@
 #define _REQUEST_H_
 
 #include <pthread.h>
-#include "global.h"
+#include "include/global.h"
 
 class HttpServer;
 

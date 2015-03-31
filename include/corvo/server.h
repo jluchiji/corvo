@@ -1,9 +1,9 @@
 #ifndef _HTTP_SERVE_H_
 #define _HTTP_SERVE_H_
 
-#include "response.h"
-#include "request.h"
-#include "global.h"
+#include "include/corvo/response.h"
+#include "include/corvo/request.h"
+#include "include/global.h"
 #include <vector>
 
 /* HTTP Server Operation Mode */

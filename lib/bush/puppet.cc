@@ -15,10 +15,10 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 
-#include "path.h"
-#include "trace.h"
-#include "plumber.h"
-#include "puppet.h"
+#include "include/trace.h"
+#include "include/bush/path.h"
+#include "include/bush/puppet.h"
+#include "include/bush/plumber.h"
 
 // Forward declarations
 Path *Puppet::_root;

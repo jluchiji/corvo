@@ -15,8 +15,8 @@
 #include <cerrno>
 #include <sys/stat.h>
 
-#include "trace.h"
-#include "plumber.h"
+#include "include/trace.h"
+#include "include/bush/plumber.h"
 
 
 // ------------------------------------------------------------------------- //

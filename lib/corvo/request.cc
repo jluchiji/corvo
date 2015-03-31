@@ -10,11 +10,11 @@
 #include <stdio.h>
 #include <string>
 
-#include "request.h"
-#include "server.h"
-#include "global.h"
-#include "trace.h"
-#include "util.h"
+#include "include/corvo/request.h"
+#include "include/corvo/server.h"
+#include "include/corvo/util.h"
+#include "include/global.h"
+#include "include/trace.h"
 
 pthread_mutex_t HttpRequest::mutex;
 
