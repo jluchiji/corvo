@@ -143,7 +143,8 @@ void HttpServer::handle(HttpRequest *request) {
   if (request -> read()) {
     response -> setStatus(RES_400);
     response -> send();
-    delete request;
+    //delete request;
+    //delete response;
     return;
   }
 

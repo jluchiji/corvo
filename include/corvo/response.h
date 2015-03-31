@@ -13,6 +13,8 @@ private:
   int              bodyCapacity;
   char            *body;
 
+  bool             sent;
+
 public:
   HttpRequest     *request;
   int              statusCode;

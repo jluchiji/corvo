@@ -3,6 +3,9 @@
 
 #include <sys/socket.h>
 #include <string.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <dirent.h>
 #include <regex.h>
 #include <map>
 

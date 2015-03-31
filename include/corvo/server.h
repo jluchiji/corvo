@@ -39,8 +39,6 @@ private:
 
   HandlerMap           handlers;
 
-  HttpHandlerFunc find_handler(const char*, const char*);
-
   static void pool_handler(HttpServer*);
   static void handle(HttpRequest*);
 
@@ -55,7 +53,7 @@ public:
   void route(const char*, const char*, HttpHandlerFunc);
 
   int  getSocket();
-
+  HttpHandlerFunc find_handler(const char*, const char*);
 
   static
   void error(HttpRequest*, HttpResponse*);

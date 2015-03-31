@@ -14,6 +14,7 @@ HttpResponse::HttpResponse(HttpRequest *request) {
   this -> request = request;
   this -> setStatus(RES_501);
 
+  sent          = false;
   bodyLength   = 0;
   bodyCapacity = SZ_LINE_BUFFER;
   body         = new char[SZ_LINE_BUFFER];
@@ -77,6 +78,8 @@ HttpResponse::write(const char *buffer) {
 
 void
 HttpResponse::send() {
+  if (sent) { return; }
+
   int sock = request -> sock;
 
   /* Write the metadata */
@@ -103,5 +106,6 @@ HttpResponse::send() {
 
   /* Shutdown and close the socket */
   shutdown(sock, SHUT_WR);
+  sent = true;
   close(sock);
 }

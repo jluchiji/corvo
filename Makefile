@@ -1,5 +1,5 @@
 CXX      = g++ -fPIC
-DEBUG    = 4
+DEBUG    = 3
 CFLAGS   = -g
 XFLAGS   = $(CFLAGS) -DDEBUG=$(DEBUG)
 
@@ -8,8 +8,8 @@ LIB     := $(TOP)/lib
 
 all: http-serve
 
-http-serve: libbush.a libcorvo.a src/main.o
-	$(CXX) -o $@ src/main.o libcorvo.a libbush.a -lpthread
+http-serve: libbush.a libcorvo.a src/main.o src/error.o src/serve.o
+	$(CXX) -o $@ src/*.o libcorvo.a libbush.a -lpthread
 
 embedded:
 	make -C $(TOP)/embed
