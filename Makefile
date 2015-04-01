@@ -8,15 +8,11 @@ LIB     := $(TOP)/lib
 
 all: clean http-serve
 
-debug: embed libbush.a libcorvo.a libtranspose.a test/main.o
+debug: resources libbush.a libcorvo.a libtranspose.a test/main.o
 	$(CXX) -o $@ test/*.o libcorvo.a libbush.a libtranspose.a -lpthread
 
-http-serve: embed libbush.a libcorvo.a libtranspose.a src/main.o src/error.o src/serve.o
+http-serve: resources libbush.a libcorvo.a libtranspose.a src/main.o src/error.o src/serve.o
 	$(CXX) -o $@ src/*.o libcorvo.a libbush.a libtranspose.a -lpthread
-
-.PHONY: embed
-embed:
-	make -C ./embed
 
 src/%.o: src/%.cc
 	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) $<
@@ -32,6 +28,10 @@ libcorvo.a:
 
 libtranspose.a:
 	make -C $(LIB)/transpose CXX="$(CXX)" XFLAGS="$(XFLAGS)" DEBUG=$(DEBUG) TOP=$(TOP)
+
+.PHONY: resources
+resources:
+	make -C $(TOP)/embed
 
 clean:
 	rm -f http-serve debug

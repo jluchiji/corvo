@@ -32,7 +32,7 @@ private:
   FragmentMap    params;                 // Фрагменты для вставки
 
 public:
-  Fragment(const unsigned char*, size_t);         //
+  Fragment(const void*, size_t);         //
   Fragment(const char*);                 // Создает фрагмент из шаблона
   ~Fragment();                           // Уничтожает объект
 

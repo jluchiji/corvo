@@ -14,7 +14,7 @@
 #include "include/transpose/buffer.h"
 #include "include/trace.h"
 
-Fragment::Fragment(const unsigned char *tmpl, size_t n) {
+Fragment::Fragment(const void *tmpl, size_t n) {
   this -> tmpl = new char[n + 1];
   memcpy(this -> tmpl, tmpl, n);
   this -> tmpl[n] = 0;

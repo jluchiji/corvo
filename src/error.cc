@@ -15,11 +15,11 @@ void error(HttpRequest *request, HttpResponse *response) {
   char code[4];
   snprintf(code, 4, "%d", response -> statusCode);
 
-  Fragment *fragment = new Fragment(error_html, error_html_len);
+  Fragment *fragment = new Fragment(error_html);
   fragment -> set("status-code", code);
   fragment -> set("status-message", response -> statusMessage);
-  fragment -> set("css-pure", new Fragment(pure_css, pure_css_len));
-  fragment -> set("css-style", new Fragment(styles_css, styles_css_len));
+  fragment -> set("css-pure", pure_css);
+  fragment -> set("css-style", styles_css);
 
   switch (response -> statusCode) {
     case 404:

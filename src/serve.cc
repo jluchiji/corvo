@@ -1,8 +1,14 @@
+#include "include/transpose/fragment.h"
+#include "include/transpose/buffer.h"
 #include "include/corvo/headers.h"
 #include "include/corvo/server.h"
 #include "include/bush/path.h"
 #include "include/global.h"
 #include "src/serve.h"
+
+#include "embed/listdir.html.h"
+#include "embed/styles.css.h"
+#include "embed/pure.css.h"
 
 #include <dirent.h>
 #include <unistd.h>
@@ -60,17 +66,30 @@ void serve(HttpRequest *request, HttpResponse *response) {
       return;
     }
 
-    /* List directory */
-    response -> write("<!doctype html><html><head><title>");
-    response -> write(request -> path);
-    response -> write("</title></head><body><ul>");
+    /* Render Directory Entries */
+    Buffer *buffer = new Buffer();
     while ((ent = readdir(dir))) {
-      response -> write("<li>");
-      response -> write(ent -> d_name);
-      response -> write("</li>\n");
+      Fragment *entry = new Fragment("<li class=\"pure-u-1-4\">{{ent-name}}</li>");
+      entry -> set("ent-name", ent -> d_name);
+      entry -> render(buffer);
+      delete entry;
     }
-    response -> write("</ul></body></html>");
+
+    /* Render Response Page */
+    Fragment *fragment = new Fragment(listdir_html);
+    fragment -> set("css-pure", pure_css);
+    fragment -> set("css-style", styles_css);
+    fragment -> set("dir-name", request -> path);
+    fragment -> set("dir-content", new Fragment(buffer -> data(), buffer -> length()));
+    delete buffer;
+    buffer = fragment -> render();
+
+    response -> write(buffer -> data(), buffer -> length());
+
+    return;
   }
 
   response -> setStatus(RES_200);
+  delete path;
+  delete strPath;
 }
