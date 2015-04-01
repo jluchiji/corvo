@@ -6,16 +6,17 @@ XFLAGS   = $(CFLAGS) -DDEBUG=$(DEBUG)
 TOP     := $(shell pwd)
 LIB     := $(TOP)/lib
 
-all: http-serve
+all: clean http-serve
 
-debug: libbush.a libcorvo.a libtranspose.a test/main.o
+debug: embed libbush.a libcorvo.a libtranspose.a test/main.o
 	$(CXX) -o $@ test/*.o libcorvo.a libbush.a libtranspose.a -lpthread
 
-http-serve: libbush.a libcorvo.a libtranspose.a src/main.o src/error.o src/serve.o
+http-serve: embed libbush.a libcorvo.a libtranspose.a src/main.o src/error.o src/serve.o
 	$(CXX) -o $@ src/*.o libcorvo.a libbush.a libtranspose.a -lpthread
 
-embedded:
-	make -C $(TOP)/embed
+.PHONY: embed
+embed:
+	make -C ./embed
 
 src/%.o: src/%.cc
 	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) $<
@@ -38,3 +39,4 @@ clean:
 	rm -f src/*.o
 	make clean -C $(LIB)/bush
 	make clean -C $(LIB)/corvo
+	make clean -C ./embed

@@ -14,6 +14,12 @@
 #include "include/transpose/buffer.h"
 #include "include/trace.h"
 
+Fragment::Fragment(const unsigned char *tmpl, size_t n) {
+  this -> tmpl = new char[n + 1];
+  memcpy(this -> tmpl, tmpl, n);
+  this -> tmpl[n] = 0;
+}
+
 // ------------------------------------------------------------------------- //
 // Конструктор. Создает объект из текста-шаблона.                            //
 // ------------------------------------------------------------------------- //
@@ -44,8 +50,7 @@ void
 Fragment::set(const char *name, Fragment *value) {
   /* Avoid redundant duplication */
   if (value) {
-    if (params[name]) { params[name] = value; }
-    else { params[strdup(name)] = value; }
+    params[strdup(name)] = value;
   }
   /* NULL value means erase */
   else {
@@ -90,6 +95,7 @@ Fragment::render(Buffer *buffer) {
     if (!(pe = strstr(ps, "}}"))) { break; }
     /* Поиск фрагмента для вставки */
     char *name = strndup(ps + 2, pe - ps - 2);
+    po = ps = pe + 2;
     Fragment *child = params[name];
     /* Если фрагмент для указанного идентификатора не существует */
     if (!child) {
@@ -100,7 +106,6 @@ Fragment::render(Buffer *buffer) {
     }
     /* Вставка фрагмента в буфер */
     child -> render(buffer);
-    po = ps = pe + 2;
     /* Уборка памяти */
     delete name;
   }

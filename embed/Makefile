@@ -1,17 +1,18 @@
+ECHO = /bin/echo
 
-all: clean grid.h jquery.h navbar.h normalize.h style.h
-	echo \#ifndef\ _EMBED_H_ >  embed.h
-	echo \#define\ _EMBED_H_ >> embed.h
-	cat embed.tmp >> embed.h
-	echo \#endif >> embed.h
-	rm -f embed.tmp
+all: pure.css.h styles.css.h error.html.h
 
-%.h: %.res
-	echo "#include \"embed/$@\"" >> embed.tmp
+%.css.h: %.css
 	xxd -i $^ > $@
 
-%.res: src/%.html
+%.css: src/%.css
+	cssmin $^ > $@
+
+%.html.h: %.html
+	xxd -i $^ > $@
+
+%.html: src/%.html
 	html-minifier $^ > $@
 
 clean:
-	rm -f *.h
+	rm *.h

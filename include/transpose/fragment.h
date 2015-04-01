@@ -14,17 +14,12 @@
 #include <cstdlib>
 #include <map>
 #include "include/transpose/buffer.h"
+#include "include/global.h"
 
 /* Опережающее объявление */
 class Fragment;
 
 /* Псевдонимы видов */
-struct StringComp :
-  public std::binary_function<const char*, const char*, bool> {
-    bool operator()(char const *a, char const *b) const {
-      return strcasecmp(a, b) < 0;
-    }
-};
 typedef std::pair<const char*, Fragment*> FragmentPair;
 typedef std::map<const char*, Fragment*, StringComp> FragmentMap;
 
@@ -37,6 +32,7 @@ private:
   FragmentMap    params;                 // Фрагменты для вставки
 
 public:
+  Fragment(const unsigned char*, size_t);         //
   Fragment(const char*);                 // Создает фрагмент из шаблона
   ~Fragment();                           // Уничтожает объект
 
