@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <cmath>
 
+#include "include/transpose/buffer.h"
 #include "include/corvo/response.h"
 #include "include/corvo/request.h"
 #include "include/corvo/headers.h"
@@ -14,10 +15,8 @@ HttpResponse::HttpResponse(HttpRequest *request) {
   this -> request = request;
   this -> setStatus(RES_501);
 
-  sent          = false;
-  bodyLength   = 0;
-  bodyCapacity = SZ_LINE_BUFFER;
-  body         = new char[SZ_LINE_BUFFER];
+  sent    = false;
+  buffer  = new Buffer();
 }
 
 HttpResponse::~HttpResponse() {
@@ -42,33 +41,8 @@ HttpResponse::setHeader(const char *name, const char *value) {
 }
 
 void
-HttpResponse::write(const unsigned char *buffer, size_t count) {
-  /* Ensure that body has sufficient capacity */
-  if (bodyCapacity - bodyLength < count) {
-    int sz = SZ_LINE_BUFFER;
-    while (sz <= bodyLength + count) { sz *= 2; }
-    body = (char*) realloc(body, sz);
-    bodyCapacity = sz;
-  }
-
-  /* Copy over the buffer */
-  memcpy(body + bodyLength, buffer, count);
-  bodyLength += count;
-}
-
-void
-HttpResponse::write(const char *buffer, size_t count) {
-  /* Ensure that body has sufficient capacity */
-  if (bodyCapacity - bodyLength < count) {
-    int sz = SZ_LINE_BUFFER;
-    while (sz <= bodyLength + count) { sz *= 2; }
-    body = (char*) realloc(body, sz);
-    bodyCapacity = sz;
-  }
-
-  /* Copy over the buffer */
-  memcpy(body + bodyLength, buffer, count);
-  bodyLength += count;
+HttpResponse::write(const void *buffer, size_t count) {
+  this -> buffer -> write(buffer, count);
 }
 
 void
@@ -94,15 +68,15 @@ HttpResponse::send() {
   DBG_VERBOSE("SEND RESPONSE\n");
 
   /* Add Content-Length if necessary */
-  if (bodyLength > 0) {
-    dprintf(sock, "Content-Length: %d\r\n", bodyLength);
+  if (buffer -> length() > 0) {
+    dprintf(sock, "Content-Length: %lu\r\n", buffer -> length());
   }
 
   /* Add the empty line */
   dprintf(sock, "\r\n");
 
   /* Add body, if appropriate */
-  ::write(sock, body, bodyLength);
+  ::write(sock, buffer -> data(), buffer -> length());
 
   /* Shutdown and close the socket */
   shutdown(sock, SHUT_WR);

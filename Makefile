@@ -1,5 +1,5 @@
 CXX      = g++ -fPIC
-DEBUG    = 3
+DEBUG    = 4
 CFLAGS   = -g
 XFLAGS   = $(CFLAGS) -DDEBUG=$(DEBUG)
 
@@ -8,13 +8,19 @@ LIB     := $(TOP)/lib
 
 all: http-serve
 
-http-serve: libbush.a libcorvo.a src/main.o src/error.o src/serve.o
-	$(CXX) -o $@ src/*.o libcorvo.a libbush.a -lpthread
+debug: libbush.a libcorvo.a libtranspose.a test/main.o
+	$(CXX) -o $@ test/*.o libcorvo.a libbush.a libtranspose.a -lpthread
+
+http-serve: libbush.a libcorvo.a libtranspose.a src/main.o src/error.o src/serve.o
+	$(CXX) -o $@ src/*.o libcorvo.a libbush.a libtranspose.a -lpthread
 
 embedded:
 	make -C $(TOP)/embed
 
 src/%.o: src/%.cc
+	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) $<
+
+test/%.o: test/%.cc
 	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) $<
 
 libbush.a:
@@ -23,8 +29,11 @@ libbush.a:
 libcorvo.a:
 	make -C $(LIB)/corvo CXX="$(CXX)" XFLAGS="$(XFLAGS)" DEBUG=$(DEBUG) TOP=$(TOP)
 
+libtranspose.a:
+	make -C $(LIB)/transpose CXX="$(CXX)" XFLAGS="$(XFLAGS)" DEBUG=$(DEBUG) TOP=$(TOP)
+
 clean:
-	rm -f http-serve
+	rm -f http-serve debug
 	rm -f *.a
 	rm -f src/*.o
 	make clean -C $(LIB)/bush

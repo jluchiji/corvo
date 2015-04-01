@@ -13,7 +13,7 @@
 
 void serve(HttpRequest *request, HttpResponse *response) {
   Path *path = new Path(HTTP_ROOT);
-  path -> push(request -> path) -> print();
+  path -> push(request -> path);
   char *strPath = path -> str();
 
   /* Find the requested file */

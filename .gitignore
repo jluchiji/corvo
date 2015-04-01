@@ -3,4 +3,5 @@
 daytime-server
 use-dlopen
 http-serve
+debug
 *.a

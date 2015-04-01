@@ -45,13 +45,16 @@ HttpRequest::HttpRequest(HttpServer* server) {
   sock = accept(server -> getSocket(), (Addr*)&address, (socklen_t*)&len);
   pthread_mutex_unlock(&HttpRequest::mutex);
 
-  // 
+  //
   if (sock < 0) { COMPLAIN("accept: %s", strerror(errno)); }
 
   ip = new Addr_in();
   memcpy(ip, &address, sizeof(address));
 }
 
+// ------------------------------------------------------------------------- //
+// Destructor.                                                               //
+// ------------------------------------------------------------------------- //
 HttpRequest::~HttpRequest() {
   delete ip;
 
@@ -62,6 +65,9 @@ HttpRequest::~HttpRequest() {
 
 }
 
+// ------------------------------------------------------------------------- //
+// Reads and parses the HTTP request message.                                //
+// ------------------------------------------------------------------------- //
 int HttpRequest::read() {
   if (read_meta() || read_body()) {
     DBG_ERR("Malformed request detected.\n");
@@ -71,6 +77,10 @@ int HttpRequest::read() {
   return 0;
 }
 
+// ------------------------------------------------------------------------- //
+// Reads and parses the first line of the HTTP request message, namely       //
+// the HTTP verb, path, query string (if any). Protol version is ignored.    //
+// ------------------------------------------------------------------------- //
 int  HttpRequest::read_meta() {
   char  buffer[SZ_LINE_BUFFER];
   char *start, *end;
@@ -81,20 +91,29 @@ int  HttpRequest::read_meta() {
   /* Get the verb */
   start = buffer;
   end   = strstr(start, " ");
-  if (!end) { return 1; }
+  if (!end) {
+    DBG_ERR("Cannot isolate HTTP verb: %s\n", buffer);
+    return 1;
+  }
   verb  = strndup(start, end - start);
 
   /* Get the path */
   start = end + 1;
   end   = EITHER(strstr(start, "?"), strstr(start, " "));
-  if (!end) { return 1; }
+  if (!end) {
+    DBG_ERR("Cannot isolate HTTP path: %s\n", buffer);
+    return 1;
+  }
   path  = strndup(start, end - start);
 
   /* Get the query string (if present) */
   if (*end == '?') {
     start = end + 1;
     end   = strstr(start, " ");
-    if (!end) { return 1; }
+    if (!end) {
+      DBG_ERR("Cannot isolate HTTP query: %s\n", buffer);
+      return 1;
+    }
     query = strndup(start, end - start);
   } else { query = NULL; }
 
@@ -106,7 +125,10 @@ int  HttpRequest::read_meta() {
     /* Read the header name */
     start = buffer;
     end   = strstr(start, ":");
-    if (!end) { return 1; }
+    if (!end) {
+      DBG_ERR("Malformed header: %s\n", buffer);
+      return 1;
+    }
     key   = strndup(start, end - start);
 
     /* Skip LWS characters per HTTP/1.1 SPEC section 4.2 */
@@ -128,6 +150,9 @@ int  HttpRequest::read_meta() {
   return 0;
 }
 
+// ------------------------------------------------------------------------- //
+// Reads the body of the HTTP request message. Requires Content-Length.      //
+// ------------------------------------------------------------------------- //
 int  HttpRequest::read_body() {
   char  buffer[SZ_LINE_BUFFER];
   char *start, *end;
