@@ -88,7 +88,7 @@ void HttpServer::listen(int port) {
     /* Thread pool */
     case POOL: while (1) {
       for (int i = 0; i < SZ_THREAD_POOL; i++) {
-        pthread_create(&pool[i], NULL, (ThreadHandler)&pool_handler, (void*)(intptr_t)sock);
+        pthread_create(&pool[i], NULL, (ThreadHandler)&pool_handler, (void*)this);
       }
       pool_handler(this);
     }

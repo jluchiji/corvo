@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   DBG_VERBOSE_N(DGRAY("VERBOSE"));
   printf("\n\n");
 
-  HttpServer *server = new HttpServer(NONE);
+  HttpServer *server = new HttpServer(POOL);
 
   server -> route("GET", "*", &serve);
   server -> route("*", "!!error/*", &error);
