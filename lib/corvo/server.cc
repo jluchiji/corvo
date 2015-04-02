@@ -141,8 +141,9 @@ void HttpServer::handle(HttpRequest *request) {
 
   /* Read request data and look for errors */
   if (request -> read()) {
-    response -> setStatus(RES_400);
-    response -> send();
+    // XXX Does this cause problems..?
+    //response -> setStatus(RES_400);
+    //response -> send();
     //delete request;
     //delete response;
     return;
