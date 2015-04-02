@@ -7,7 +7,7 @@
 
 #include "embed/error.html.h"
 #include "embed/styles.css.h"
-#include "embed/pure.css.h"
+#include "embed/bootstrap.css.h"
 
 void error(HttpRequest *request, HttpResponse *response) {
   DBG_ERR("%d %s\n", response -> statusCode, response -> statusMessage);
@@ -18,7 +18,7 @@ void error(HttpRequest *request, HttpResponse *response) {
   Fragment *fragment = new Fragment(error_html);
   fragment -> set("status-code", code);
   fragment -> set("status-message", response -> statusMessage);
-  fragment -> set("css-pure", pure_css);
+  fragment -> set("css-bootstrap", bootstrap_css);
   fragment -> set("css-style", styles_css);
 
   switch (response -> statusCode) {

@@ -6,9 +6,12 @@
 #include "include/global.h"
 #include "src/serve.h"
 
+#include "embed/direntry.html.h"
+#include "embed/bootstrap.css.h"
 #include "embed/listdir.html.h"
 #include "embed/styles.css.h"
-#include "embed/pure.css.h"
+#include "embed/folder.svg.h"
+#include "embed/file.svg.h"
 
 #include <dirent.h>
 #include <unistd.h>
@@ -69,17 +72,27 @@ void serve(HttpRequest *request, HttpResponse *response) {
     /* Render Directory Entries */
     Buffer *buffer = new Buffer();
     while ((ent = readdir(dir))) {
-      Fragment *entry = new Fragment("<li class=\"pure-u-1-4\">{{ent-name}}</li>");
+
+      if (!strcmp(ent -> d_name, ".") || !strcmp(ent -> d_name, "..")) { continue; }
+      Path *entryPath = new Path(request -> path);
+      entryPath -> pushd(ent -> d_name);
+      char *strEntryPath = entryPath -> str();
+      delete entryPath;
+
+      Fragment *entry = new Fragment(direntry_html);
+      entry -> set("ent-icon", file_svg);
       entry -> set("ent-name", ent -> d_name);
+      entry -> set("ent-link", strEntryPath);
       entry -> render(buffer);
+      delete strEntryPath;
       delete entry;
     }
 
     /* Render Response Page */
     Fragment *fragment = new Fragment(listdir_html);
-    fragment -> set("css-pure", pure_css);
+    fragment -> set("css-bootstrap", bootstrap_css);
     fragment -> set("css-style", styles_css);
-    fragment -> set("dir-name", request -> path);
+    fragment -> set("dir-name", path -> name());
     fragment -> set("dir-content", new Fragment(buffer -> data(), buffer -> length()));
     delete buffer;
     buffer = fragment -> render();

@@ -4,13 +4,13 @@
     <title>{{dir-name}} | Corvo HTTP Server</title>
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
     <style>
-      {{css-pure}}
+      {{css-bootstrap}}
     </style>
     <style>
       {{css-style}}
     </style>
   </head>
-  <body>
+  <body id="listdir">
     <header>
       <div class="summary">
         <span class="dirname">
@@ -18,8 +18,11 @@
         </span>
       </div>
     </header>
-    <div class="content pure-g">
-      <ul class="dir-list">
+    <div class="toolbar clearfix">
+
+    </div>
+    <div class="content container">
+      <ul class="dir-list tile-view">
         {{dir-content}}
       </ul>
     </div>

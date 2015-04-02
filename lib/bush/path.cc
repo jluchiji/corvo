@@ -185,6 +185,17 @@ Path::print() {
 }
 
 // ------------------------------------------------------------------------- //
+// Gets the name (i.e. the last segment) of the path object.                 //
+// The string returned is still a part of the path, so do not delete it!     //
+// ------------------------------------------------------------------------- //
+char*
+Path::name() {
+  if (segments -> empty()) { return NULL; }
+  else { return segments -> back(); }
+}
+
+
+// ------------------------------------------------------------------------- //
 // Creates a string representation of the Path object.                       //
 // Data returned by this method is not managed by the Path object, therefore //
 // it is up to the caller to free the return value.                          //

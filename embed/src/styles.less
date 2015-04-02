@@ -1,0 +1,149 @@
+@color-main: #AF7DD9;
+
+
+* { box-sizing: border-box; }
+
+html, body {
+  background: #FBFBFB;
+}
+body {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  overflow: auto;
+}
+
+header {
+  position: relative;
+  z-index: 65535;
+  padding: 50px 0;
+  background: linear-gradient(-40deg, #02C4E0 0%,#B27BD8 100%);
+  box-shadow: 0px 0px 8px 1px rgba(0,0,0,0.85);
+
+  .summary {
+    color: white;
+    font-size: 32px;
+    font-family: 'Helvetica Neue', 'Segoe UI', sans-serif;
+    text-align: center;
+
+    @media (min-width: 768px) { font-size: 48px; }
+    @media (min-width: 991px) { font-size: 54px; }
+
+    .code { font-weight: bold; }
+    .message {
+      font-weight: 100;
+      white-space: nowrap;
+    }
+  }
+
+}
+
+div.toolbar {
+  position: relative;
+  z-index: 0;
+  height: 50px;
+  background: #F0F0F0;
+  border-bottom: 1px solid #DDD;
+}
+
+div.content {
+  background: none;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  color: #777;
+  line-height: 1.4;
+
+  @media (min-width: 768px) { width: 750px; }
+  @media (min-width: 992px) { width: 970px; }
+  @media (min-width: 1200px) { width: 1170px; }
+}
+
+footer {
+
+  margin: 10px;
+
+  text-align: center;
+  font-size: 10px;
+  color: #999;
+
+  a {
+    color: #02C4E0;
+    text-decoration: none;
+  }
+}
+
+ul.dir-list {
+  user-select: none;
+  -webkit-user-select: none;
+  text-align: left;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  // Fix a typesetting bug
+  .ent-name { letter-spacing: normal; }
+
+  // Tile View
+  &.tile-view > li {
+
+    .dir-entry {
+
+      transition: all 0.15s ease-in-out;
+
+      background: #FFF;
+
+      @icon-size: 64px;
+
+      display: block;
+      position: relative;
+      height: @icon-size + 20px;
+      min-width: @icon-size + 20px;
+      padding: 10px;
+      cursor: pointer;
+
+      color: #555;
+      text-decoration: none;
+
+      margin: 15px 0;
+
+      border: 1px solid #DDD;
+      border-radius: 2px;
+      &:hover {
+        border-color: @color-main;
+        box-shadow: 0 2px 10px 0 fadeout(black, 84%);
+      }
+      &:active {
+        border-color: darken(@color-main, 15%);
+        background: fadeout(black, 85%);
+      }
+
+      padding-left: @icon-size + 20px;
+      svg {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        width: @icon-size;
+        height: @icon-size;
+      }
+
+      .ent-name {
+        line-height: @icon-size;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+
+
+
+    }
+
+
+
+  }
+
+}
+
+#error div.content { padding: 30px; }
