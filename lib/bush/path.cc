@@ -225,6 +225,10 @@ Path::str() {
          *segment = pr;
 
     nseg -> pop_front();
+
+    // Skip empty segments
+    if (!strlen(segment)) { continue; }
+
     while (*pr) { *pw++ = *pr++; }
     if (!nseg -> empty()) { *pw++ = '/'; }
     segments -> push_back(segment);
