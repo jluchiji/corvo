@@ -2,6 +2,6 @@
 *.so
 daytime-server
 use-dlopen
-http-serve
+httpd
 debug
 *.a

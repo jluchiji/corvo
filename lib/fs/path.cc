@@ -28,7 +28,7 @@
 #include <assert.h>
 #include <string>
 #include "include/trace.h"
-#include "include/bush/path.h"
+#include "include/fs/path.h"
 
 // ------------------------------------------------------------------------- //
 // Default constructor. Creates a relative Path object with no segments.     //

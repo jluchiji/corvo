@@ -8,4 +8,6 @@
 
 void serve(HttpRequest*, HttpResponse*);
 
+void serve_file(HttpRequest*, HttpResponse*);
+
 #endif

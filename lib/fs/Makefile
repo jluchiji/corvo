@@ -1,6 +1,5 @@
-
-all: plumber.o puppet.o
-	ar rvs $(TOP)/libbush.a *.o
+all: path.o fs.o
+	ar rvs $(TOP)/libfs.a *.o
 
 %.o: %.cc
 	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) $<

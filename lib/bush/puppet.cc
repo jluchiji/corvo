@@ -17,7 +17,7 @@
 #include <sys/wait.h>
 
 #include "include/trace.h"
-#include "include/bush/path.h"
+#include "include/fs/path.h"
 #include "include/bush/puppet.h"
 #include "include/bush/plumber.h"
 
