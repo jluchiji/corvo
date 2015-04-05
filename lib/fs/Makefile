@@ -1,4 +1,4 @@
-all: path.o fs.o
+all: path.o fileinfo.o
 	ar rvs $(TOP)/libfs.a *.o
 
 %.o: %.cc

@@ -20,7 +20,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-void serve(HttpRequest *request, HttpResponse *response) {
+void
+serve(HttpRequest *request, HttpResponse *response) {
   Path *path = new Path(HTTP_ROOT);
   path -> push(request -> path);
   char *strPath = path -> str();
@@ -36,15 +37,7 @@ void serve(HttpRequest *request, HttpResponse *response) {
   }
 
   /* If this is a file, serve it.. */
-  if (!S_ISDIR(d_stat.st_mode)) {
-    // TODO Determine MIME type
-    int  fd = open(strPath, O_RDONLY, S_IREAD);
-    int  count;
-    char buffer[SZ_LINE_BUFFER];
-    while ((count = read(fd, buffer, SZ_LINE_BUFFER)) > 0) {
-      response -> write(buffer, count);
-    }
-  }
+  if (!S_ISDIR(d_stat.st_mode)) { serve_file(response, strPath); }
   /* Directory.. list it */
   else {
     DIR      *dir = opendir(strPath);
@@ -105,4 +98,19 @@ void serve(HttpRequest *request, HttpResponse *response) {
   response -> setStatus(RES_200);
   delete path;
   delete strPath;
+}
+
+void
+serve_file(HttpResponse *response, const char *path) {
+  int  fd = open(strPath, O_RDONLY, S_IREAD);
+  int  count;
+  char buffer[SZ_LINE_BUFFER];
+  while ((count = read(fd, buffer, SZ_LINE_BUFFER)) > 0) {
+    response -> write(buffer, count);
+  }
+}
+
+void
+serve_dir(HttpResponse *response, const char *path) {
+
 }

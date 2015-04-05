@@ -6,8 +6,11 @@
 
 #define HTTP_ROOT "http-root-dir"
 
+
 void serve(HttpRequest*, HttpResponse*);
 
-void serve_file(HttpRequest*, HttpResponse*);
+void serve_file(HttpResponse*, const char*);
+
+void serve_dir(HttpResponse*, const char*);
 
 #endif
