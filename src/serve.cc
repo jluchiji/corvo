@@ -2,8 +2,10 @@
 #include "include/transpose/buffer.h"
 #include "include/corvo/headers.h"
 #include "include/corvo/server.h"
+#include "include/fs/fileinfo.h"
 #include "include/fs/path.h"
 #include "include/global.h"
+#include "include/trace.h"
 #include "src/serve.h"
 
 #include "embed/direntry.html.h"
@@ -22,92 +24,92 @@
 
 void
 serve(HttpRequest *request, HttpResponse *response) {
+  HttpServer *server = request -> server;
+  //Path *path = new Path(request -> path);
   Path *path = new Path(HTTP_ROOT);
   path -> push(request -> path);
-  char *strPath = path -> str();
 
-  /* Find the requested file */
-  DirStat d_stat;
-  if (stat(strPath, &d_stat)) {
-    response -> setStatus(RES_404);
-    HttpHandlerFunc errHandler =
-      request -> server -> find_handler("*", "!!error/404");
-    (*errHandler)(request, response);
-    return;
-  }
+  char *strPath = path -> str(); // TODO Remove this
 
-  /* If this is a file, serve it.. */
-  if (!S_ISDIR(d_stat.st_mode)) { serve_file(response, strPath); }
-  /* Directory.. list it */
-  else {
-    DIR      *dir = opendir(strPath);
-    DirEntry *ent;
+  FileInfo *fi = new FileInfo(path);
 
-    /* Handle opendir errors here */
-    if (!dir) {
-      HttpHandlerFunc errHandler;
-      switch (errno) {
-        case EACCES:
-          errHandler = request -> server -> find_handler("*", "!!error/403");
-          break;
-        case ENOENT:
-          errHandler = request -> server -> find_handler("*", "!!error/404");
-          break;
-        default:
-          errHandler = request -> server -> find_handler("*", "!!error/500");
-          break;
+  switch (fi -> getType()) {
+
+    case FT_NOENT: {
+      response -> setStatus(RES_404);
+      server -> redirect("*", "!!error/404", request, response);
+    } break;
+
+    case FT_FILE: {
+      int  fd = fi -> open(O_RDONLY, S_IREAD);
+      int  count;
+      char buffer[SZ_LINE_BUFFER];
+      while ((count = read(fd, buffer, SZ_LINE_BUFFER)) > 0) {
+        response -> write(buffer, count);
+      }
+    } break;
+
+    case FT_DIR: {
+      /* Handle opendir errors here */
+      if (fi -> opendir()) {
+        switch (errno) {
+          case EACCES:
+            response -> setStatus(RES_403);
+            server -> redirect("*", "!!error/403", request, response);
+            break;
+          case ENOENT:
+            response -> setStatus(RES_404);
+            server -> redirect("*", "!!error/404", request, response);
+            break;
+          default:
+            perror("FT_DIR");
+            response -> setStatus(RES_500);
+            server -> redirect("*", "!!error/500", request, response);
+            break;
+        }
+        return;
       }
 
-      (*errHandler)(request, response);
-      return;
-    }
+      /* Check if directory contains index.html */
+      //Path *indexPath = new Path()
 
-    /* Render Directory Entries */
-    Buffer *buffer = new Buffer();
-    while ((ent = readdir(dir))) {
+      /* Render Directory Entries */
+      Buffer *buffer = new Buffer();
+      FileInfo *child;
+      while ((child = fi -> readdir())) {
 
-      if (!strcmp(ent -> d_name, ".") || !strcmp(ent -> d_name, "..")) { continue; }
-      Path *entryPath = new Path(request -> path);
-      entryPath -> pushd(ent -> d_name);
-      char *strEntryPath = entryPath -> str();
-      delete entryPath;
+        if (!child -> getName() || !strcmp(child -> getName(), "..")) { continue; }
+        char *strEntryPath = child -> getPath() -> str();
 
-      Fragment *entry = new Fragment(direntry_html);
-      entry -> set("ent-icon", file_svg);
-      entry -> set("ent-name", ent -> d_name);
-      entry -> set("ent-link", strEntryPath);
-      entry -> render(buffer);
-      delete strEntryPath;
-      delete entry;
-    }
+        Fragment *entry = new Fragment(direntry_html);
+        entry -> set("ent-icon", file_svg);
+        entry -> set("ent-name", child -> getName());
+        entry -> set("ent-link", strEntryPath);
+        entry -> render(buffer);
+        delete strEntryPath;
+      }
 
-    /* Render Response Page */
-    Fragment *fragment = new Fragment(listdir_html);
-    fragment -> set("css-bootstrap", bootstrap_css);
-    fragment -> set("css-style", styles_css);
-    fragment -> set("dir-name", path -> name());
-    fragment -> set("dir-content", new Fragment(buffer -> data(), buffer -> length()));
-    delete buffer;
-    buffer = fragment -> render();
+      /* Render Response Page */
+      Fragment *fragment = new Fragment(listdir_html);
+      fragment -> set("css-bootstrap", bootstrap_css);
+      fragment -> set("css-style", styles_css);
+      fragment -> set("dir-name", path -> name());
+      fragment -> set("dir-content", new Fragment(buffer -> data(), buffer -> length()));
+      delete buffer;
+      buffer = fragment -> render();
 
-    response -> write(buffer -> data(), buffer -> length());
+      response -> write(buffer -> data(), buffer -> length());
+    } break;
 
-    return;
   }
 
   response -> setStatus(RES_200);
   delete path;
-  delete strPath;
 }
 
 void
 serve_file(HttpResponse *response, const char *path) {
-  int  fd = open(strPath, O_RDONLY, S_IREAD);
-  int  count;
-  char buffer[SZ_LINE_BUFFER];
-  while ((count = read(fd, buffer, SZ_LINE_BUFFER)) > 0) {
-    response -> write(buffer, count);
-  }
+
 }
 
 void

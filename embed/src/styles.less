@@ -95,7 +95,7 @@ ul.dir-list {
 
       background: #FFF;
 
-      @icon-size: 64px;
+      @icon-size: 32px;
 
       display: block;
       position: relative;
@@ -120,14 +120,23 @@ ul.dir-list {
         background: fadeout(black, 85%);
       }
 
-      padding-left: @icon-size + 20px;
-      svg {
+      padding-left: @icon-size + 30px;
+      .ent-icon {
         position: absolute;
-        left: 10px;
-        top: 10px;
-        width: @icon-size;
-        height: @icon-size;
+        left: 0px;
+        top: 0px;
+        bottom: 0px;
+        width: @icon-size + 20;
+
+        background: #F1F1F1;
+
+        svg {
+          margin: 10px;
+          width: @icon-size;
+          height: @icon-size;
+        }
       }
+
 
       .ent-name {
         line-height: @icon-size;
@@ -139,8 +148,6 @@ ul.dir-list {
 
 
     }
-
-
 
   }
 

@@ -132,6 +132,15 @@ HttpServer::find_handler(const char *verb, const char *path) {
   return handler;
 }
 
+void
+HttpServer::redirect(const char   *verb,
+                     const char   *url,
+                     HttpRequest  *request,
+                     HttpResponse *response) {
+  HttpHandlerFunc handler = this -> find_handler(verb, url);
+  (*handler)(request, response);
+}
+
 void HttpServer::handle(HttpRequest *request) {
 
   /* Create the response object */
