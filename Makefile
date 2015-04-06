@@ -21,7 +21,8 @@ test/%.o: test/%.cc
 	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) $<
 
 %.a:
-	make -C $(LIB)/$(shell sed 's/^lib//g; s/\.a$$//g;' <<< $@) CXX="$(CXX)" XFLAGS="$(XFLAGS)" DEBUG=$(DEBUG) TOP=$(TOP)
+	@echo Building $@...
+	@make -s -C $(LIB)/$(shell sed 's/^lib//g; s/\.a$$//g;' <<< $@) CXX="$(CXX)" XFLAGS="$(XFLAGS)" DEBUG=$(DEBUG) TOP=$(TOP)
 
 .PHONY: resources
 resources:

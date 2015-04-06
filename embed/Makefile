@@ -3,23 +3,24 @@ ECHO = /bin/echo
 all: error.html.h listdir.html.h direntry.html.h bootstrap.css.h styles.css.h file.svg.h folder.svg.h
 
 %.h: %
-	$(ECHO) \#ifndef\ $(subst .,_,$^) > $@
-	$(ECHO) \#define\ $(subst .,_,$^)\ \\ >> $@
-	hexdump -e '24/1 "_x%02X" "\n"' $^ | sed 's/_/\\/g; s/.*/    "&"/; s/\\x  //g; s/$$/\\/g;' >> $@
-	$(ECHO) >> $@
-	$(ECHO) \#endif >> $@
+	@echo Building $@...
+	@$(ECHO) \#ifndef\ $(subst .,_,$^) > $@
+	@$(ECHO) \#define\ $(subst .,_,$^)\ \\ >> $@
+	@hexdump -e '24/1 "_x%02X" "\n"' $^ | sed 's/_/\\/g; s/.*/    "&"/; s/\\x  //g; s/$$/\\/g;' >> $@
+	@$(ECHO) >> $@
+	@$(ECHO) \#endif >> $@
 
 %.css: src/%.css
-	cssmin $^ > $@
+	@cssmin $^ > $@
 
 %.css: src/%.less
-	lessc $^ | cssmin > $@
+	@lessc $^ | cssmin > $@
 
 %.html: src/%.html
-	html-minifier $^ > $@
+	@html-minifier $^ > $@
 
 %.svg: src/%.svg
-	cp $^ $@
+	@cp $^ $@
 
 clean:
-	rm -f *.h
+	@rm -f *.h
