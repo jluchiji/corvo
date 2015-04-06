@@ -4,12 +4,13 @@
 #include "include/transpose/fragment.h"
 #include "include/global.h"
 #include "include/trace.h"
+#include "include/corvo/handler.h"
 
 #include "embed/error.html.h"
 #include "embed/styles.css.h"
 #include "embed/bootstrap.css.h"
 
-void error(HttpRequest *request, HttpResponse *response) {
+void ErrorHandler::handle(HttpRequest *request, HttpResponse *response) {
   DBG_ERR("%d %s\n", response -> statusCode, response -> statusMessage);
 
   char code[4];

@@ -23,9 +23,8 @@
 #include <sys/stat.h>
 
 void
-serve(HttpRequest *request, HttpResponse *response) {
+StaticFileServer::handle(HttpRequest *request, HttpResponse *response) {
   HttpServer *server = request -> server;
-  //Path *path = new Path(request -> path);
   Path *path = new Path(HTTP_ROOT);
   path -> push(request -> path);
 
@@ -79,18 +78,35 @@ serve(HttpRequest *request, HttpResponse *response) {
       while ((child = fi -> readdir())) {
 
         if (!child -> getName() || !strcmp(child -> getName(), "..")) { continue; }
-        char *strEntryPath = child -> getPath() -> str();
-
         Fragment *entry = new Fragment(direntry_html);
-        entry -> set("ent-icon", file_svg);
         entry -> set("ent-name", child -> getName());
-        entry -> set("ent-link", strEntryPath);
+
+        /* Directory */
+        if (child -> getType() == FT_DIR) {
+          entry -> set("ent-icon", folder_svg);
+          char *link = new char[strlen(child -> getName()) + 1];
+          strcpy(link, child -> getName());
+          link[strlen(child -> getName())] = '/';
+          link[strlen(child -> getName()) + 1] = '\0';
+          entry -> set("ent-link", link);
+          delete link;
+        }
+        /* File */
+        else {
+          entry -> set("ent-icon", file_svg);
+          entry -> set("ent-link", child -> getName());
+        }
+
+
+
+
+
         entry -> render(buffer);
-        delete strEntryPath;
       }
 
       /* Render Response Page */
       Fragment *fragment = new Fragment(listdir_html);
+      fragment -> set("link-base", request -> path);
       fragment -> set("css-bootstrap", bootstrap_css);
       fragment -> set("css-style", styles_css);
       fragment -> set("dir-name", path -> name());
@@ -105,14 +121,4 @@ serve(HttpRequest *request, HttpResponse *response) {
 
   response -> setStatus(RES_200);
   delete path;
-}
-
-void
-serve_file(HttpResponse *response, const char *path) {
-
-}
-
-void
-serve_dir(HttpResponse *response, const char *path) {
-
 }

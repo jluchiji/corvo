@@ -1,16 +1,19 @@
 #ifndef _SERVE_H_
 #define _SERVE_H_
 
+#include "include/corvo/handler.h"
 #include "include/corvo/request.h"
 #include "include/corvo/response.h"
 
 #define HTTP_ROOT "http-root-dir"
 
+class StaticFileServer : public HttpHandler {
 
-void serve(HttpRequest*, HttpResponse*);
+public:
 
-void serve_file(HttpResponse*, const char*);
+  void handle(HttpRequest*, HttpResponse*);
 
-void serve_dir(HttpResponse*, const char*);
+
+};
 
 #endif

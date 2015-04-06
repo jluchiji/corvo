@@ -15,6 +15,7 @@
 #include "include/corvo/response.h"
 #include "include/corvo/request.h"
 #include "include/corvo/headers.h"
+#include "include/corvo/handler.h"
 #include "include/corvo/server.h"
 #include "include/corvo/util.h"
 #include "include/global.h"
@@ -22,7 +23,7 @@
 
 HttpServer::HttpServer(HttpServerMode mode) {
   this -> mode = mode;
-  this -> route("*", "!!error/*", HttpServer::error);
+  this -> route("*", "!!error/*", new HttpHandler());
 }
 
 HttpServer::~HttpServer() {
@@ -116,9 +117,9 @@ void HttpServer::pool_handler(HttpServer* server) {
   }
 }
 
-HttpHandlerFunc
+HttpHandler*
 HttpServer::find_handler(const char *verb, const char *path) {
-  HttpHandlerFunc handler = NULL;
+  HttpHandler *handler = NULL;
   HandlerMap::iterator it = handlers.begin();
   for (; it !=  handlers.end(); ++it) {
     /* Match path regex */
@@ -137,8 +138,8 @@ HttpServer::redirect(const char   *verb,
                      const char   *url,
                      HttpRequest  *request,
                      HttpResponse *response) {
-  HttpHandlerFunc handler = this -> find_handler(verb, url);
-  (*handler)(request, response);
+  HttpHandler *handler = this -> find_handler(verb, url);
+  handler -> handle(request, response);
 }
 
 void HttpServer::handle(HttpRequest *request) {
@@ -164,15 +165,14 @@ void HttpServer::handle(HttpRequest *request) {
   DBG_INFO("[%s] %s %s\n", buffer, request -> verb, request -> path);
 
   /* Find the first matching route handler */
-  HttpHandlerFunc handler = request -> server -> find_handler(request -> verb, request -> path);
+  HttpHandler *handler = request -> server -> find_handler(request -> verb, request -> path);
 
   /* If handler was not found...that is a 405 */
   if (!handler) {
     response -> setStatus(RES_405);
-    HttpHandlerFunc errHandler = request -> server -> find_handler("*", "!!error/405");
-    (*errHandler)(request, response);
+    request -> server -> redirect("*", "!!error/405", request, response);
   } else {
-    (*handler)(request, response);
+    handler -> handle(request, response);
   }
 
   response -> send();
@@ -182,17 +182,12 @@ void HttpServer::handle(HttpRequest *request) {
 
 void HttpServer::route(const char      *verb,
                        const char      *path,
-                       HttpHandlerFunc  handler) {
+                       HttpHandler     *handler) {
   /*  */
-  HttpHandler *mapping = new HttpHandler();
+  HttpHandlerMacro *mapping = new HttpHandlerMacro();
   mapping -> verb    = strdup(verb);
   mapping -> regex   = Util::toRegex(path);
   mapping -> handler = handler;
 
   handlers.push_front(mapping);
-}
-
-void HttpServer::error(HttpRequest  *request,
-                       HttpResponse *response) {
-  response -> write(response -> statusMessage);
 }

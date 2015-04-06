@@ -1,6 +1,7 @@
 #ifndef _ERROR_H_
 #define _ERROR_H_
 
+#include "include/corvo/handler.h"
 #include "include/corvo/request.h"
 #include "include/corvo/response.h"
 
@@ -15,6 +16,9 @@
 #define ERR_DEFAULT \
   "Something went terribly wrong :("
 
-void error(HttpRequest*, HttpResponse*);
+class ErrorHandler : public HttpHandler {
+public:
+  void handle(HttpRequest*, HttpResponse*);
+};
 
 #endif

@@ -3,6 +3,7 @@
 
 #include "include/corvo/response.h"
 #include "include/corvo/request.h"
+#include "include/corvo/handler.h"
 #include "include/global.h"
 #include <list>
 
@@ -17,16 +18,13 @@ enum HttpServerMode {
   THREAD
 };
 
-/* HTTP Request Handler Function */
-typedef void (*HttpHandlerFunc)(HttpRequest*, HttpResponse*);
-
 /* HTTP Request Handler */
 typedef struct {
   char             *verb;
   Regex            *regex;
-  HttpHandlerFunc   handler;
-} HttpHandler;
-typedef std::list<HttpHandler*> HandlerMap;
+  HttpHandler      *handler;
+} HttpHandlerMacro;
+typedef std::list<HttpHandlerMacro*> HandlerMap;
 
 /* HTTP Server Class */
 class HttpServer {
@@ -50,15 +48,12 @@ public:
   void listen();
   void listen(int);
 
-  void route(const char*, const char*, HttpHandlerFunc);
+  void route(const char*, const char*, HttpHandler*);
 
   int  getSocket();
-  HttpHandlerFunc find_handler(const char*, const char*);
+  HttpHandler* find_handler(const char*, const char*);
 
   void redirect(const char*, const char*, HttpRequest*, HttpResponse*);
-
-  static
-  void error(HttpRequest*, HttpResponse*);
 };
 
 #endif
