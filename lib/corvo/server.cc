@@ -142,6 +142,16 @@ HttpServer::redirect(const char   *verb,
   handler -> handle(request, response);
 }
 
+void
+HttpServer::panic(HttpRequest* request, HttpResponse* response) {
+
+  char *errorRoute = new char[SZ_ERR_ROUTE];
+  snprintf(errorRoute, SZ_ERR_ROUTE, FMT_ERR_ROUTE, response -> statusCode);
+  HttpHandler* handler = find_handler("*", errorRoute);
+  handler -> handle(request, response);
+  delete errorRoute;
+}
+
 void HttpServer::handle(HttpRequest *request) {
 
   /* Create the response object */

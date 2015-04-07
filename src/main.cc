@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 
   HttpServer *server = new HttpServer(POOL);
 
-  server -> route("GET", "*", new StaticFileServer());
+  server -> route("GET", "*", new StaticFileServer("http-root-dir"));
   server -> route("*", "!!error/*", new ErrorHandler());
   server -> listen(9090);
 

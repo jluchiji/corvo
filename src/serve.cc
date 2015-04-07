@@ -22,13 +22,29 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+StaticFileServer::StaticFileServer(const char *path) {
+  root = new Path(path);
+}
+
+StaticFileServer::~StaticFileServer() {
+  delete root;
+}
+
+void
+StaticFileServer::serve_file(FileInfo* fi, HttpResponse* response) {
+  int  fd = fi -> open(O_RDONLY, S_IREAD);
+  int  count;
+  char buffer[SZ_LINE_BUFFER];
+  while ((count = read(fd, buffer, SZ_LINE_BUFFER)) > 0) {
+    response -> write(buffer, count);
+  }
+}
+
 void
 StaticFileServer::handle(HttpRequest *request, HttpResponse *response) {
   HttpServer *server = request -> server;
-  Path *path = new Path(HTTP_ROOT);
+  Path *path = root -> clone();
   path -> push(request -> path);
-
-  char *strPath = path -> str(); // TODO Remove this
 
   FileInfo *fi = new FileInfo(path);
 
@@ -36,17 +52,10 @@ StaticFileServer::handle(HttpRequest *request, HttpResponse *response) {
 
     case FT_NOENT: {
       response -> setStatus(RES_404);
-      server -> redirect("*", "!!error/404", request, response);
+      server -> panic(request, response);
     } break;
 
-    case FT_FILE: {
-      int  fd = fi -> open(O_RDONLY, S_IREAD);
-      int  count;
-      char buffer[SZ_LINE_BUFFER];
-      while ((count = read(fd, buffer, SZ_LINE_BUFFER)) > 0) {
-        response -> write(buffer, count);
-      }
-    } break;
+    case FT_FILE: { serve_file(fi, response); } break;
 
     case FT_DIR: {
       /* Handle opendir errors here */
@@ -54,23 +63,27 @@ StaticFileServer::handle(HttpRequest *request, HttpResponse *response) {
         switch (errno) {
           case EACCES:
             response -> setStatus(RES_403);
-            server -> redirect("*", "!!error/403", request, response);
             break;
           case ENOENT:
             response -> setStatus(RES_404);
-            server -> redirect("*", "!!error/404", request, response);
             break;
           default:
-            perror("FT_DIR");
             response -> setStatus(RES_500);
-            server -> redirect("*", "!!error/500", request, response);
             break;
         }
+        server -> panic(request, response);
         return;
       }
 
       /* Check if directory contains index.html */
-      //Path *indexPath = new Path()
+      Path *indexPath = path -> clone() -> pushd("index.html");
+      FileInfo *index = new FileInfo(indexPath);
+      delete indexPath;
+      if (index -> exists()) {
+        serve_file(index, response);
+        delete index;
+        return;
+      }
 
       /* Render Directory Entries */
       Buffer *buffer = new Buffer();

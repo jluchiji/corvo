@@ -54,6 +54,7 @@ public:
   HttpHandler* find_handler(const char*, const char*);
 
   void redirect(const char*, const char*, HttpRequest*, HttpResponse*);
+  void panic(HttpRequest*, HttpResponse*);
 };
 
 #endif
