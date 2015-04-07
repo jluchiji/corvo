@@ -1,14 +1,14 @@
 #include "error.h"
 
-#include "transpose/buffer.h"
-#include "transpose/fragment.h"
-#include "global.h"
 #include "trace.h"
-#include "corvo/handler.h"
+#include "global.h"
+#include "io/buffer.h"
+#include "middleware/base.h"
+#include "templating/fragment.h"
 
-#include "embed/error.html.h"
-#include "embed/styles.css.h"
-#include "embed/bootstrap.css.h"
+#include "res/error.html.h"
+#include "res/styles.css.h"
+#include "res/bootstrap.css.h"
 
 ErrorHandler::ErrorHandler() {
   statusCode = -1;

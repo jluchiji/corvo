@@ -17,9 +17,9 @@
 #include <sys/wait.h>
 
 #include "trace.h"
-#include "fs/path.h"
-#include "bush/puppet.h"
-#include "bush/plumber.h"
+#include "io/path.h"
+#include "puppet.h"
+#include "plumber.h"
 
 // Forward declarations
 Path *Puppet::_root;

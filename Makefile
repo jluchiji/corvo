@@ -1,37 +1,28 @@
-CXX      = g++ -fPIC
-DEBUG    = 3
-CFLAGS   = -g
-XFLAGS   = $(CFLAGS) -DDEBUG=$(DEBUG)
+ODIR    = obj
+SDIR    = src
+HDIR    = inc
+DEBUG   = 3
 
-TOP     := $(shell pwd)
-LIB     := $(TOP)/lib
+OUT     = httpd
+INC     = -Iinc
+CFLAGS  = -fPIC -g
+LDFLAGS = -lpthread
 
-all: clean httpd
+CXX     = g++
+ECHO    = /bin/echo
+MKDIR   = mkdir -p
 
-debug: resources libbush.a libcorvo.a libtranspose.a libfs.a test/main.o
-	$(CXX) -o $@ test/*.o *.a -lpthread
+OBJS    = $(patsubst $(SDIR)/%.cc, $(ODIR)/%.o, $(shell find $(SDIR) -type f -name "*.cc"))
 
-httpd: resources libbush.a libcorvo.a libtranspose.a libfs.a src/main.o src/error.o src/serve.o
-	$(CXX) -o $@ src/*.o *.a -lpthread
+all: $(OUT)
 
-src/%.o: src/%.cc
-	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) -I$(TOP)/include -I. $<
+$(ODIR)/%.o: $(SDIR)/%.cc
+	@$(ECHO) -n Compiling $(@F)...
+	@$(MKDIR) $(@D)
+	@$(CXX) $(CFLAGS) -DDEBUG=$(DEBUG) -o $@ -c $< -I$(HDIR) -I$(patsubst $(ODIR)/%,$(HDIR)/%,$(@D))
+	@$(ECHO) Success!
 
-test/%.o: test/%.cc
-	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP)/include -I. $<
-
-%.a:
-	@echo Building $@...
-	@make -s -C $(LIB)/$(shell sed 's/^lib//g; s/\.a$$//g;' <<< $@) CXX="$(CXX)" XFLAGS="$(XFLAGS)" DEBUG=$(DEBUG) TOP=$(TOP)
-
-.PHONY: resources
-resources:
-	make -C $(TOP)/embed
-
-clean:
-	rm -f httpd debug
-	rm -f *.a
-	rm -f src/*.o
-	make clean -C $(LIB)/bush
-	make clean -C $(LIB)/corvo
-	make clean -C ./embed
+$(OUT): $(OBJS)
+	@$(ECHO) -n Linking $(@F)...
+	@$(CXX) $(LDFLAGS) -o $(OUT) $(OBJS)
+	@$(ECHO) Done!

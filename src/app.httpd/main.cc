@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "corvo/headers.h"
-#include "corvo/server.h"
+#include "http/headers.h"
+#include "http/server.h"
 #include "trace.h"
 
 #include "error.h"

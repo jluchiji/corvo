@@ -5,3 +5,5 @@ use-dlopen
 httpd
 debug
 *.a
+
+obj

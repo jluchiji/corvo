@@ -16,7 +16,7 @@
 #include <sys/stat.h>
 
 #include "trace.h"
-#include "bush/plumber.h"
+#include "plumber.h"
 
 
 // ------------------------------------------------------------------------- //

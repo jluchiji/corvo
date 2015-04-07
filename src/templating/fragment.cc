@@ -10,8 +10,8 @@
 // ------------------------------------------------------------------------- //
 #include <string.h>
 
-#include "transpose/fragment.h"
-#include "transpose/buffer.h"
+#include "fragment.h"
+#include "io/buffer.h"
 #include "trace.h"
 
 Fragment::Fragment(const void *tmpl, size_t n) {
