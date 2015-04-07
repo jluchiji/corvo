@@ -4,12 +4,12 @@
 #include <stdio.h>
 #include <cmath>
 
-#include "include/transpose/buffer.h"
-#include "include/corvo/response.h"
-#include "include/corvo/request.h"
-#include "include/corvo/headers.h"
-#include "include/global.h"
-#include "include/trace.h"
+#include "transpose/buffer.h"
+#include "corvo/response.h"
+#include "corvo/request.h"
+#include "corvo/headers.h"
+#include "global.h"
+#include "trace.h"
 
 HttpResponse::HttpResponse(HttpRequest *request) {
   this -> request = request;

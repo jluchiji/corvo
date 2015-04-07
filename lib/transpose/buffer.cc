@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "include/transpose/buffer.h"
+#include "transpose/buffer.h"
 
 // ------------------------------------------------------------------------- //
 // Constructor. Creates a Buffer instance with the default capacity.         //

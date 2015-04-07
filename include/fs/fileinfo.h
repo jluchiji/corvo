@@ -2,7 +2,7 @@
 #define _FILEINFO_H_
 
 #include <dirent.h>
-#include "include/fs/path.h"
+#include "fs/path.h"
 
 /* Type of file entry */
 enum FileType {

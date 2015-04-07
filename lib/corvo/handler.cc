@@ -1,7 +1,7 @@
-#include "include/corvo/response.h"
-#include "include/corvo/headers.h"
-#include "include/corvo/request.h"
-#include "include/corvo/handler.h"
+#include "corvo/response.h"
+#include "corvo/headers.h"
+#include "corvo/request.h"
+#include "corvo/handler.h"
 
 void
 HttpHandler::handle(HttpRequest *request, HttpResponse *response) {

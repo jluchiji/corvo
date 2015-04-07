@@ -1,11 +1,11 @@
 #ifndef _SERVE_H_
 #define _SERVE_H_
 
-#include "include/fs/path.h"
-#include "include/fs/fileinfo.h"
-#include "include/corvo/handler.h"
-#include "include/corvo/request.h"
-#include "include/corvo/response.h"
+#include "fs/path.h"
+#include "fs/fileinfo.h"
+#include "corvo/handler.h"
+#include "corvo/request.h"
+#include "corvo/response.h"
 
 #define HTTP_ROOT "http-root-dir"
 
@@ -14,6 +14,7 @@ private:
   Path    *root;
 
   void serve_file(FileInfo*, HttpResponse*);
+  void serve_dir(FileInfo*, HttpResponse*);
 
 public:
 

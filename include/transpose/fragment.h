@@ -13,8 +13,8 @@
 
 #include <cstdlib>
 #include <map>
-#include "include/transpose/buffer.h"
-#include "include/global.h"
+#include "transpose/buffer.h"
+#include "global.h"
 
 /* Опережающее объявление */
 class Fragment;

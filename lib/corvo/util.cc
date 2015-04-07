@@ -4,10 +4,10 @@
 #include <errno.h>
 #include <string>
 
-#include "include/corvo/util.h"
-#include "include/fs/path.h"
-#include "include/global.h"
-#include "include/trace.h"
+#include "corvo/util.h"
+#include "fs/path.h"
+#include "global.h"
+#include "trace.h"
 
 ssize_t
 Util::readline(int fd, char *buffer, size_t n) {

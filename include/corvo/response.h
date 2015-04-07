@@ -1,9 +1,9 @@
 #ifndef _RESPONSE_H_
 #define _RESPONSE_H_
 
-#include "include/transpose/buffer.h"
-#include "include/corvo/request.h"
-#include "include/global.h"
+#include "transpose/buffer.h"
+#include "corvo/request.h"
+#include "global.h"
 
 class HttpResponse {
 private:

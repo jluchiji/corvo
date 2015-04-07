@@ -15,10 +15,10 @@ httpd: resources libbush.a libcorvo.a libtranspose.a libfs.a src/main.o src/erro
 	$(CXX) -o $@ src/*.o *.a -lpthread
 
 src/%.o: src/%.cc
-	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) -I. $<
+	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) -I$(TOP)/include -I. $<
 
 test/%.o: test/%.cc
-	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) -I. $<
+	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP)/include -I. $<
 
 %.a:
 	@echo Building $@...

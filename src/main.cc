@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-#include "include/corvo/headers.h"
-#include "include/corvo/server.h"
-#include "include/trace.h"
+#include "corvo/headers.h"
+#include "corvo/server.h"
+#include "trace.h"
 
-#include "src/error.h"
-#include "src/serve.h"
+#include "error.h"
+#include "serve.h"
 
 int main(int argc, char *argv[]) {
 

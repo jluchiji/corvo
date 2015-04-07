@@ -1,9 +1,9 @@
 #ifndef _ERROR_H_
 #define _ERROR_H_
 
-#include "include/corvo/handler.h"
-#include "include/corvo/request.h"
-#include "include/corvo/response.h"
+#include "corvo/handler.h"
+#include "corvo/request.h"
+#include "corvo/response.h"
 
 #define ERR_404 \
   "The resource you are looking for is nowhere to be found.<br>" \

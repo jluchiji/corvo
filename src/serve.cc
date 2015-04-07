@@ -1,12 +1,12 @@
-#include "include/transpose/fragment.h"
-#include "include/transpose/buffer.h"
-#include "include/corvo/headers.h"
-#include "include/corvo/server.h"
-#include "include/fs/fileinfo.h"
-#include "include/fs/path.h"
-#include "include/global.h"
-#include "include/trace.h"
-#include "src/serve.h"
+#include "transpose/fragment.h"
+#include "transpose/buffer.h"
+#include "corvo/headers.h"
+#include "corvo/server.h"
+#include "fs/fileinfo.h"
+#include "fs/path.h"
+#include "global.h"
+#include "trace.h"
+#include "serve.h"
 
 #include "embed/direntry.html.h"
 #include "embed/bootstrap.css.h"
@@ -31,13 +31,60 @@ StaticFileServer::~StaticFileServer() {
 }
 
 void
-StaticFileServer::serve_file(FileInfo* fi, HttpResponse* response) {
+StaticFileServer::serve_file(FileInfo *fi, HttpResponse *response) {
   int  fd = fi -> open(O_RDONLY, S_IREAD);
   int  count;
   char buffer[SZ_LINE_BUFFER];
   while ((count = read(fd, buffer, SZ_LINE_BUFFER)) > 0) {
     response -> write(buffer, count);
   }
+}
+
+void
+StaticFileServer::serve_dir(FileInfo *fi, HttpResponse *response) {
+  /* Render Directory Entries */
+  Buffer *buffer = new Buffer();
+  FileInfo *child;
+  while ((child = fi -> readdir())) {
+    /* Skip . and .. */
+    if (!child -> getName() || !strcmp(child -> getName(), "..")) { continue; }
+
+    /* Create a fragment for the directory entry and set its name */
+    Fragment *entry = new Fragment(direntry_html);
+    entry -> set("ent-name", child -> getName());
+
+    /* Directory */
+    if (child -> getType() == FT_DIR) {
+      entry -> set("ent-icon", folder_svg);
+      Buffer *link = new Buffer();
+      link -> write(child -> getName(), strlen(child -> getName()));
+      link -> write("/\0", sizeof(char) * 2);
+      entry -> set("ent-link", (char*)link -> data());
+      delete link;
+    }
+    /* File */
+    else {
+      entry -> set("ent-icon", file_svg);
+      entry -> set("ent-link", child -> getName());
+    }
+
+
+
+
+
+    entry -> render(buffer);
+  }
+
+  /* Render Response Page */
+  Fragment *fragment = new Fragment(listdir_html);
+  fragment -> set("css-bootstrap", bootstrap_css);
+  fragment -> set("css-style", styles_css);
+  fragment -> set("dir-name", fi -> getName());
+  fragment -> set("dir-content", new Fragment(buffer -> data(), buffer -> length()));
+  delete buffer;
+  buffer = fragment -> render();
+
+  response -> write(buffer -> data(), buffer -> length());
 }
 
 void
@@ -61,7 +108,6 @@ StaticFileServer::handle(HttpRequest *request, HttpResponse *response) {
 
       // If this is a directory and path does not have tailing slash,
       // we need to send back a 301.
-      DBG_INFO("%c\n", request -> path[strlen(request -> path) - 1]);
       if (request -> path[strlen(request -> path) - 1] != '/') {
         response -> setStatus(RES_301);
 
@@ -100,50 +146,11 @@ StaticFileServer::handle(HttpRequest *request, HttpResponse *response) {
         delete index;
         return;
       }
+      delete index;
 
-      /* Render Directory Entries */
-      Buffer *buffer = new Buffer();
-      FileInfo *child;
-      while ((child = fi -> readdir())) {
+      /* Serve directory */
+      serve_dir(fi, response);
 
-        if (!child -> getName() || !strcmp(child -> getName(), "..")) { continue; }
-        Fragment *entry = new Fragment(direntry_html);
-        entry -> set("ent-name", child -> getName());
-
-        /* Directory */
-        if (child -> getType() == FT_DIR) {
-          entry -> set("ent-icon", folder_svg);
-          char *link = new char[strlen(child -> getName()) + 1];
-          strcpy(link, child -> getName());
-          link[strlen(child -> getName())] = '/';
-          link[strlen(child -> getName()) + 1] = '\0';
-          entry -> set("ent-link", link);
-          delete link;
-        }
-        /* File */
-        else {
-          entry -> set("ent-icon", file_svg);
-          entry -> set("ent-link", child -> getName());
-        }
-
-
-
-
-
-        entry -> render(buffer);
-      }
-
-      /* Render Response Page */
-      Fragment *fragment = new Fragment(listdir_html);
-      fragment -> set("link-base", request -> path);
-      fragment -> set("css-bootstrap", bootstrap_css);
-      fragment -> set("css-style", styles_css);
-      fragment -> set("dir-name", path -> name());
-      fragment -> set("dir-content", new Fragment(buffer -> data(), buffer -> length()));
-      delete buffer;
-      buffer = fragment -> render();
-
-      response -> write(buffer -> data(), buffer -> length());
     } break;
 
   }

@@ -19,11 +19,11 @@
 #include <stdio.h>
 #include <string>
 
-#include "include/corvo/request.h"
-#include "include/corvo/server.h"
-#include "include/corvo/util.h"
-#include "include/global.h"
-#include "include/trace.h"
+#include "corvo/request.h"
+#include "corvo/server.h"
+#include "corvo/util.h"
+#include "global.h"
+#include "trace.h"
 
 // Forward declarations
 pthread_mutex_t HttpRequest::mutex;

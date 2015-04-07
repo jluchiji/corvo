@@ -1,10 +1,10 @@
-#include "src/error.h"
+#include "error.h"
 
-#include "include/transpose/buffer.h"
-#include "include/transpose/fragment.h"
-#include "include/global.h"
-#include "include/trace.h"
-#include "include/corvo/handler.h"
+#include "transpose/buffer.h"
+#include "transpose/fragment.h"
+#include "global.h"
+#include "trace.h"
+#include "corvo/handler.h"
 
 #include "embed/error.html.h"
 #include "embed/styles.css.h"
