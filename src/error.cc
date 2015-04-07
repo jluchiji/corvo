@@ -10,8 +10,20 @@
 #include "embed/styles.css.h"
 #include "embed/bootstrap.css.h"
 
-void ErrorHandler::handle(HttpRequest *request, HttpResponse *response) {
+ErrorHandler::ErrorHandler() {
+  statusCode = -1;
+}
+
+ErrorHandler::ErrorHandler(int code, const char *message) {
+  statusCode    = code;
+  statusMessage = message;
+}
+
+void
+ErrorHandler::handle(HttpRequest *request, HttpResponse *response) {
   DBG_ERR("%d %s\n", response -> statusCode, response -> statusMessage);
+
+  if (statusCode > 0) { response -> setStatus(statusCode, statusMessage); }
 
   char code[4];
   snprintf(code, 4, "%d", response -> statusCode);

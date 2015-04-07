@@ -45,7 +45,7 @@ public:
   Path* reduce();              // Resolves '.' and '..' segments where possible.
   Path* print();               // Prints the string representation of the path.
 
-  char* name();                // Gets the name (i.e. last segment) of the path.
+  const char* name();          // Gets the name (i.e. last segment) of the path.
 
   char* str();                 // Returns a string representation of the path.
   char* resolve(Path*);        // Resolves a path relative to another.

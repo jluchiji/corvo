@@ -17,7 +17,15 @@
   "Something went terribly wrong :("
 
 class ErrorHandler : public HttpHandler {
+private:
+  int         statusCode;
+  const char *statusMessage;
+
 public:
+
+  ErrorHandler();
+  ErrorHandler(int, const char*);
+
   void handle(HttpRequest*, HttpResponse*);
 };
 

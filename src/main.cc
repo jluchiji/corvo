@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "include/corvo/headers.h"
 #include "include/corvo/server.h"
 #include "include/trace.h"
 
@@ -24,8 +25,9 @@ int main(int argc, char *argv[]) {
 
   HttpServer *server = new HttpServer(POOL);
 
-  server -> route("GET", "*", new StaticFileServer("http-root-dir"));
-  server -> route("*", "!!error/*", new ErrorHandler());
+  server -> route("GET", "*",         new StaticFileServer("http-root-dir"));
+  server -> route("*",   "/",         new ErrorHandler(RES_403));
+  server -> route("*",   "!!error/*", new ErrorHandler());
   server -> listen(9090);
 
 }

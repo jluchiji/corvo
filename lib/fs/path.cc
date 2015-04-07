@@ -188,10 +188,15 @@ Path::print() {
 // Gets the name (i.e. the last segment) of the path object.                 //
 // The string returned is still a part of the path, so do not delete it!     //
 // ------------------------------------------------------------------------- //
-char*
+const char*
 Path::name() {
   if (segments -> empty()) { return NULL; }
-  else { return segments -> back(); }
+  const char *result = NULL;
+  SegmentList::iterator it = segments -> begin();
+  for (; it != segments -> end(); ++it) {
+    if (strlen(*it)) { result = *it; }
+  }
+  return result;
 }
 
 
