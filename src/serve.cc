@@ -58,6 +58,22 @@ StaticFileServer::handle(HttpRequest *request, HttpResponse *response) {
     case FT_FILE: { serve_file(fi, response); } break;
 
     case FT_DIR: {
+
+      // If this is a directory and path does not have tailing slash,
+      // we need to send back a 301.
+      DBG_INFO("%c\n", request -> path[strlen(request -> path) - 1]);
+      if (request -> path[strlen(request -> path) - 1] != '/') {
+        response -> setStatus(RES_301);
+
+        Buffer *location = new Buffer();
+        location -> write(request -> path, strlen(request -> path));
+        location -> write("/\0", sizeof(char) * 2);
+        response -> setHeader("Location", (char*)location -> data());
+        delete location;
+
+        return;
+      }
+
       /* Handle opendir errors here */
       if (fi -> opendir()) {
         switch (errno) {
