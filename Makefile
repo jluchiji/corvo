@@ -1,5 +1,5 @@
 CXX      = g++ -fPIC
-DEBUG    = 4
+DEBUG    = 3
 CFLAGS   = -g
 XFLAGS   = $(CFLAGS) -DDEBUG=$(DEBUG)
 
@@ -15,10 +15,10 @@ httpd: resources libbush.a libcorvo.a libtranspose.a libfs.a src/main.o src/erro
 	$(CXX) -o $@ src/*.o *.a -lpthread
 
 src/%.o: src/%.cc
-	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) $<
+	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) -I. $<
 
 test/%.o: test/%.cc
-	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) $<
+	$(CXX) $(XFLAGS) -o $@ -c -I$(TOP) -I. $<
 
 %.a:
 	@echo Building $@...

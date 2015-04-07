@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    title {{dir-name}} | Corvo HTTP Server
+    meta(name = 'viewport', content = 'width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no')
+    style {{css-bootstrap}}
+    style {{css-style}}
+  body#error
+    header
+      .summary
+        span.dirname {{dir-name}}
+    .toolbar.clearfix
+    .content.container
+      ul.dir-list.tile-view {{dir-content}}
+    footer
+      | Powered by
+      a(href = '#') Corvo HTTP Server 1.0

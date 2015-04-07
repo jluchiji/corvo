@@ -16,8 +16,8 @@ all: error.html.h listdir.html.h direntry.html.h bootstrap.css.h styles.css.h fi
 %.css: src/%.less
 	@lessc $^ | cssmin > $@
 
-%.html: src/%.html
-	@html-minifier $^ > $@
+%.html: src/%.jade
+	@jade < $^ > $@
 
 %.svg: src/%.svg
 	@cp $^ $@
