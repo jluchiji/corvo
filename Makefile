@@ -18,9 +18,23 @@ MKDIR   = mkdir -p
 # Compilation and linking of the httpd executable.                            #
 # --------------------------------------------------------------------------- #
 
-OBJS    = $(patsubst $(SDIR)/%.cc, $(ODIR)/%.o, $(shell find $(SDIR) -type f -name "*.cc"))
+SRCS    = $(shell find $(SDIR) -type f -name "*.cc")
+OBJS    = $(patsubst $(SDIR)/%.cc, $(ODIR)/%.o,   $(SRCS))
+DEPS    = $(patsubst $(SDIR)/%.cc, $(ODIR)/%.dep, $(SRCS))
 
 all: $(OUT)
+
+.deps: $(DEPS)
+
+$(ODIR)/%.dep: $(SDIR)/%.cc
+	@$(CXX) $(CFLAGS) -I$(HDIR) -I$(patsubst $(ODIR)/%,$(HDIR)/%,$(@D)) -MM $^ >> .deps
+
+-include .deps
+
+$(OUT): $(OBJS)
+	@$(ECHO) -n Linking $(@F)...
+	@$(CXX) $(LDFLAGS) -o $(OUT) $(OBJS)
+	@$(ECHO) Done!
 
 $(ODIR)/%.o: $(SDIR)/%.cc
 	@$(ECHO) -n Compiling $(@F)...
@@ -28,10 +42,7 @@ $(ODIR)/%.o: $(SDIR)/%.cc
 	@$(CXX) $(CFLAGS) -DDEBUG=$(DEBUG) -o $@ -c $< -I$(HDIR) -I$(patsubst $(ODIR)/%,$(HDIR)/%,$(@D))
 	@$(ECHO) Success!
 
-$(OUT): $(OBJS)
-	@$(ECHO) -n Linking $(@F)...
-	@$(CXX) $(LDFLAGS) -o $(OUT) $(OBJS)
-	@$(ECHO) Done!
+
 
 # --------------------------------------------------------------------------- #
 # Conversion of binary files into embeddable resource headers.                #
@@ -73,10 +84,13 @@ $(TDIR)/%: $(RDIR)/%.svg
 # --------------------------------------------------------------------------- #
 # Cleanup.                                                                    #
 # --------------------------------------------------------------------------- #
-.PHONY: clean clean-res
+.PHONY: clean clean-res clean-deps
 clean-res:
 	@rm -f $(RHDIR)/*.h
 
-clean:
+clean-deps:
+	@rm -f .deps
+
+clean: clean-deps
 	@rm -rf obj tmp
 	@rm -f httpd
