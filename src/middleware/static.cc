@@ -8,6 +8,7 @@
 #include "templating/fragment.h"
 #include "http/headers.h"
 #include "http/server.h"
+#include "http/mime.h"
 #include "io/fileinfo.h"
 #include "io/buffer.h"
 #include "io/path.h"
@@ -15,28 +16,25 @@
 #include "trace.h"
 #include "static.h"
 
-#include "app.httpd/res/direntry.h"
-#include "app.httpd/res/bootstrap.h"
-#include "app.httpd/res/listdir.h"
-#include "app.httpd/res/styles.h"
-#include "app.httpd/res/folder.h"
-#include "app.httpd/res/file.h"
-
 #define DEF_DIRITEM "<li><a href=\"{{ent-link}}\">{{ent-name}}</a></li>"
 #define DEF_DIRLIST "<!doctype html><html><head><title>{{dir-name}}</title></head>"\
                     "<body><ul>{{dir-content}}</ul></body></html>"
 
 
-StaticFile::StaticFile(const char *path) {
+Static::Static(const char *path) {
   root = new Path(path);
 }
 
-StaticFile::~StaticFile() {
+Static::~Static() {
   delete root;
 }
 
 void
-StaticFile::serve_file(FileInfo *fi, HttpResponse *response) {
+Static::serve_file(FileInfo *fi, HttpResponse *response) {
+  /* Determine MIME type */
+  const char *mime = Mime::find(fi -> getName());
+  if (mime) { response -> setHeader("Content-Type", mime); }
+  /* Write file to response */
   int  fd = fi -> open(O_RDONLY, S_IREAD);
   int  count;
   char buffer[SZ_LINE_BUFFER];
@@ -46,7 +44,7 @@ StaticFile::serve_file(FileInfo *fi, HttpResponse *response) {
 }
 
 void
-StaticFile::serve_dir(FileInfo *fi, HttpResponse *response) {
+Static::serve_dir(FileInfo *fi, HttpResponse *response) {
   /* Render Directory Entries */
   Buffer entries;
 
@@ -67,7 +65,7 @@ StaticFile::serve_dir(FileInfo *fi, HttpResponse *response) {
 }
 
 void
-StaticFile::render_file(FileInfo *fi, Buffer *output) {
+Static::render_file(FileInfo *fi, Buffer *output) {
   Fragment entry(DEF_DIRITEM);
   entry.set("ent-name", fi -> getName());
   entry.set("ent-link", fi -> getName());
@@ -75,7 +73,7 @@ StaticFile::render_file(FileInfo *fi, Buffer *output) {
 }
 
 void
-StaticFile::render_dir(FileInfo *fi, Buffer *entries, Buffer *output) {
+Static::render_dir(FileInfo *fi, Buffer *entries, Buffer *output) {
   Fragment fragment(DEF_DIRLIST);
   fragment.set("dir-name", fi -> getName());
   fragment.set("dir-content", new Fragment(entries -> data(), entries -> length()));
@@ -83,7 +81,7 @@ StaticFile::render_dir(FileInfo *fi, Buffer *entries, Buffer *output) {
 }
 
 void
-StaticFile::handle(HttpRequest *request, HttpResponse *response) {
+Static::handle(HttpRequest *request, HttpResponse *response) {
   HttpServer *server = request -> server;
   Path path;
   path.push(root);
@@ -115,16 +113,6 @@ StaticFile::handle(HttpRequest *request, HttpResponse *response) {
         return;
       }
 
-      /* Handle opendir errors here */
-      if (fi.opendir()) {
-        switch (errno) {
-          case EACCES: { response -> setStatus(RES_403); } break;
-          case ENOENT: { response -> setStatus(RES_404); } break;
-          default:     { response -> setStatus(RES_500); } break;
-        }
-        server -> panic(request, response);
-        return;
-      }
 
       /* Check if directory contains index.html */
       Path indexPath;
@@ -133,6 +121,18 @@ StaticFile::handle(HttpRequest *request, HttpResponse *response) {
       FileInfo index(&indexPath);
       if (index.exists()) {
         serve_file(&index, response);
+        response -> setStatus(RES_200);
+        return;
+      }
+
+      /* Handle opendir errors here */
+      if (fi.opendir()) {
+        switch (errno) {
+          case EACCES: { response -> setStatus(RES_403); } break;
+          case ENOENT: { response -> setStatus(RES_404); } break;
+          default:     { response -> setStatus(RES_500); } break;
+        }
+        server -> panic(request, response);
         return;
       }
 

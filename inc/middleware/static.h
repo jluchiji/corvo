@@ -4,7 +4,7 @@
 #include "io/fileinfo.h"
 #include "base.h"
 
-class StaticFile : public HttpMiddleware {
+class Static : public HttpMiddleware {
 protected:
   Path           *root;
 
@@ -16,8 +16,8 @@ protected:
 
 public:
 
-  StaticFile(const char*);
-  ~StaticFile();
+  Static(const char*);
+  ~Static();
 
   void handle(HttpRequest*, HttpResponse*);
 };

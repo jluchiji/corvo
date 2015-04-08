@@ -22,12 +22,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-StaticFileServer::StaticFileServer(const char* root) : StaticFile(root) {
-  
+Serve::Serve(const char* root) : Static(root) {
+
 }
 
 void
-StaticFileServer::render_file(FileInfo *fi, Buffer *output) {
+Serve::render_file(FileInfo *fi, Buffer *output) {
   Fragment entry(RES_DIRENTRY);
   entry.set("ent-name", fi -> getName());
 
@@ -50,7 +50,7 @@ StaticFileServer::render_file(FileInfo *fi, Buffer *output) {
 }
 
 void
-StaticFileServer::render_dir(FileInfo *fi, Buffer *entries, Buffer *output) {
+Serve::render_dir(FileInfo *fi, Buffer *entries, Buffer *output) {
   Fragment page(RES_LISTDIR);
   page.set("css-bootstrap", RES_BOOTSTRAP);
   page.set("css-style", RES_STYLES);

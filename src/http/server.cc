@@ -20,14 +20,16 @@
 #include "server.h"
 #include "global.h"
 #include "trace.h"
+#include "mime.h"
 
 HttpServer::HttpServer(HttpServerMode mode) {
   this -> mode = mode;
   this -> route("*", "!!error/*", new HttpMiddleware());
+  Mime::init();
 }
 
 HttpServer::~HttpServer() {
-
+  Mime::init();
 }
 
 void HttpServer::listen() {
@@ -155,7 +157,6 @@ HttpServer::panic(HttpRequest* request, HttpResponse* response) {
 void HttpServer::handle(HttpRequest *request) {
 
   /* Create the response object */
-  HttpServer   *server   = request -> server;
   HttpResponse *response = new HttpResponse(request);
   response -> setHeader(RES_POW); // Default header
 
@@ -168,11 +169,6 @@ void HttpServer::handle(HttpRequest *request) {
     //delete response;
     return;
   }
-
-  /* Get the client IP address for logging purposes */
-  Addr_in *ip = request -> ip;
-  char *buffer = inet_ntoa(ip -> sin_addr);
-  DBG_INFO("[%s] %s %s\n", buffer, request -> verb, request -> path);
 
   /* Find the first matching route handler */
   HttpMiddleware *handler = request -> server -> find_handler(request -> verb, request -> path);

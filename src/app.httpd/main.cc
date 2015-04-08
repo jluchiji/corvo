@@ -2,9 +2,10 @@
 
 #include "http/headers.h"
 #include "http/server.h"
+#include "http/mime.h"
 #include "trace.h"
 
-#include "middleware/static.h"
+#include "middleware/redirect.h"
 
 #include "error.h"
 #include "serve.h"
@@ -27,9 +28,11 @@ int main(int argc, char *argv[]) {
 
   HttpServer *server = new HttpServer(POOL);
 
-  server -> route("GET", "*",         new StaticFileServer("http-root-dir"));
-  server -> route("*",   "/",         new ErrorHandler(RES_403));
-  server -> route("*",   "!!error/*", new ErrorHandler());
+  server -> route("GET", "*",         new Serve("http-root-dir"));
+  server -> route("*",   "/",         new Redirect("/htdocs/"));
+  server -> route("GET", "/cgi-bin/*",new Error(RES_501));
+  server -> route("*",   "!!error/*", new Error());
+
   server -> listen(9090);
 
 }

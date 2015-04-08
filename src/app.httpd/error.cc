@@ -10,17 +10,17 @@
 #include "res/styles.h"
 #include "res/bootstrap.h"
 
-ErrorHandler::ErrorHandler() {
+Error::Error() {
   statusCode = -1;
 }
 
-ErrorHandler::ErrorHandler(int code, const char *message) {
+Error::Error(int code, const char *message) {
   statusCode    = code;
   statusMessage = message;
 }
 
 void
-ErrorHandler::handle(HttpRequest *request, HttpResponse *response) {
+Error::handle(HttpRequest *request, HttpResponse *response) {
   DBG_ERR("%d %s\n", response -> statusCode, response -> statusMessage);
 
   if (statusCode > 0) { response -> setStatus(statusCode, statusMessage); }

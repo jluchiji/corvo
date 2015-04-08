@@ -9,15 +9,15 @@
 
 #define HTTP_ROOT "http-root-dir"
 
-class StaticFileServer : public StaticFile {
+class Serve : public Static {
 private:
 
   void render_file(FileInfo*, Buffer*);
-  void render_dir(FileInfo*, Buffer*, Buffer*);
+  void render_dir (FileInfo*, Buffer*, Buffer*);
 
 public:
 
-  StaticFileServer(const char*);
+  Serve(const char*);
 
 };
 

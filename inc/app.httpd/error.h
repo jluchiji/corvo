@@ -16,15 +16,15 @@
 #define ERR_DEFAULT \
   "Something went terribly wrong :("
 
-class ErrorHandler : public HttpMiddleware {
+class Error : public HttpMiddleware {
 private:
   int         statusCode;
   const char *statusMessage;
 
 public:
 
-  ErrorHandler();
-  ErrorHandler(int, const char*);
+  Error();
+  Error(int, const char*);
 
   void handle(HttpRequest*, HttpResponse*);
 };

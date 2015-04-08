@@ -25,17 +25,4 @@
 /* Headers */
 #define RES_POW       "X-Powered-By", "Corvo/1.0"
 
-/* MIME Types */
-#define MIME_HTML     "text/html"
-#define MIME_CSS      "text/css"
-#define MIME_PLAIN    "text/plain"
-#define MIME_XML      "text/xml"
-#define MIME_GIF      "image/gif"
-#define MIME_JPG      "image/jpeg"
-#define MIME_PNG      "image/png"
-#define MIME_SVG      "image/svg+xml"
-#define MIME_TIFF     "image/tiff"
-#define MIME_JS       "application/javascript"
-#define MIME_JSON     "application/json"
-
 #endif
