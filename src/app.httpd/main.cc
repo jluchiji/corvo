@@ -4,6 +4,8 @@
 #include "http/server.h"
 #include "trace.h"
 
+#include "middleware/static.h"
+
 #include "error.h"
 #include "serve.h"
 

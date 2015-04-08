@@ -5,23 +5,20 @@
 #include "io/fileinfo.h"
 #include "http/request.h"
 #include "http/response.h"
-#include "middleware/base.h"
+#include "middleware/static.h"
 
 #define HTTP_ROOT "http-root-dir"
 
-class StaticFileServer : public HttpMiddleware {
+class StaticFileServer : public StaticFile {
 private:
-  Path    *root;
 
-  void serve_file(FileInfo*, HttpResponse*);
-  void serve_dir(FileInfo*, HttpResponse*);
+  void render_file(FileInfo*, Buffer*);
+  void render_dir(FileInfo*, Buffer*, Buffer*);
 
 public:
 
   StaticFileServer(const char*);
-  ~StaticFileServer();
 
-  void handle(HttpRequest*, HttpResponse*);
 };
 
 #endif

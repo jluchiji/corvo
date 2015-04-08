@@ -13,6 +13,10 @@ CXX     = g++
 ECHO    = /bin/echo
 MKDIR   = mkdir -p
 
+all: $(OUT)
+
+force: clean clean-res resources $(OUT)
+	@rm -rf $(TDIR)
 
 # --------------------------------------------------------------------------- #
 # Compilation and linking of the httpd executable.                            #
@@ -21,8 +25,6 @@ MKDIR   = mkdir -p
 SRCS    = $(shell find $(SDIR) -type f -name "*.cc")
 OBJS    = $(patsubst $(SDIR)/%.cc, $(ODIR)/%.o,   $(SRCS))
 DEPS    = $(patsubst $(SDIR)/%.cc, $(ODIR)/%.dep, $(SRCS))
-
-all: $(OUT)
 
 .deps: $(DEPS)
 
@@ -41,7 +43,6 @@ $(ODIR)/%.o: $(SDIR)/%.cc
 	@$(MKDIR) $(@D)
 	@$(CXX) $(CFLAGS) -DDEBUG=$(DEBUG) -o $@ -c $< -I$(HDIR) -I$(patsubst $(ODIR)/%,$(HDIR)/%,$(@D))
 	@$(ECHO) Success!
-
 
 
 # --------------------------------------------------------------------------- #
