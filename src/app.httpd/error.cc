@@ -6,9 +6,9 @@
 #include "middleware/base.h"
 #include "templating/fragment.h"
 
-#include "res/error.html.h"
-#include "res/styles.css.h"
-#include "res/bootstrap.css.h"
+#include "res/error.h"
+#include "res/styles.h"
+#include "res/bootstrap.h"
 
 ErrorHandler::ErrorHandler() {
   statusCode = -1;
@@ -28,11 +28,11 @@ ErrorHandler::handle(HttpRequest *request, HttpResponse *response) {
   char code[4];
   snprintf(code, 4, "%d", response -> statusCode);
 
-  Fragment *fragment = new Fragment(error_html);
+  Fragment *fragment = new Fragment(RES_ERROR);
   fragment -> set("status-code", code);
   fragment -> set("status-message", response -> statusMessage);
-  fragment -> set("css-bootstrap", bootstrap_css);
-  fragment -> set("css-style", styles_css);
+  fragment -> set("css-bootstrap", RES_BOOTSTRAP);
+  fragment -> set("css-style", RES_STYLES);
 
   switch (response -> statusCode) {
     case 404:

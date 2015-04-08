@@ -1,9 +1,7 @@
 *.o
 *.so
-daytime-server
-use-dlopen
-httpd
-debug
 *.a
+httpd
 
 obj
+tmp

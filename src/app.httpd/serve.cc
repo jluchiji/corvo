@@ -8,12 +8,12 @@
 #include "trace.h"
 #include "serve.h"
 
-#include "res/direntry.html.h"
-#include "res/bootstrap.css.h"
-#include "res/listdir.html.h"
-#include "res/styles.css.h"
-#include "res/folder.svg.h"
-#include "res/file.svg.h"
+#include "res/direntry.h"
+#include "res/bootstrap.h"
+#include "res/listdir.h"
+#include "res/styles.h"
+#include "res/folder.h"
+#include "res/file.h"
 
 #include <dirent.h>
 #include <unistd.h>
@@ -50,12 +50,12 @@ StaticFileServer::serve_dir(FileInfo *fi, HttpResponse *response) {
     if (!child -> getName() || !strcmp(child -> getName(), "..")) { continue; }
 
     /* Create a fragment for the directory entry and set its name */
-    Fragment *entry = new Fragment(direntry_html);
+    Fragment *entry = new Fragment(RES_DIRENTRY);
     entry -> set("ent-name", child -> getName());
 
     /* Directory */
     if (child -> getType() == FT_DIR) {
-      entry -> set("ent-icon", folder_svg);
+      entry -> set("ent-icon", RES_FOLDER);
       Buffer *link = new Buffer();
       link -> write(child -> getName(), strlen(child -> getName()));
       link -> write("/\0", sizeof(char) * 2);
@@ -64,7 +64,7 @@ StaticFileServer::serve_dir(FileInfo *fi, HttpResponse *response) {
     }
     /* File */
     else {
-      entry -> set("ent-icon", file_svg);
+      entry -> set("ent-icon", RES_FILE);
       entry -> set("ent-link", child -> getName());
     }
 
@@ -76,9 +76,9 @@ StaticFileServer::serve_dir(FileInfo *fi, HttpResponse *response) {
   }
 
   /* Render Response Page */
-  Fragment *fragment = new Fragment(listdir_html);
-  fragment -> set("css-bootstrap", bootstrap_css);
-  fragment -> set("css-style", styles_css);
+  Fragment *fragment = new Fragment(RES_LISTDIR);
+  fragment -> set("css-bootstrap", RES_BOOTSTRAP);
+  fragment -> set("css-style", RES_STYLES);
   fragment -> set("dir-name", fi -> getName());
   fragment -> set("dir-content", new Fragment(buffer -> data(), buffer -> length()));
   delete buffer;
