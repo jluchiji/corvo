@@ -21,9 +21,11 @@ Error::Error(int code, const char *message) {
 
 void
 Error::handle(HttpRequest *request, HttpResponse *response) {
-  DBG_ERR("%d %s\n", response -> statusCode, response -> statusMessage);
+  //DBG_ERR("%d %s\n", response -> statusCode, response -> statusMessage);
 
-  if (statusCode > 0) { response -> setStatus(statusCode, statusMessage); }
+  if (statusCode > 0) {
+    response -> setStatus(statusCode, statusMessage);
+  }
 
   char code[4];
   snprintf(code, 4, "%d", response -> statusCode);

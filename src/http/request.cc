@@ -70,7 +70,6 @@ HttpRequest::~HttpRequest() {
 // ------------------------------------------------------------------------- //
 int HttpRequest::read() {
   if (read_meta() || read_body()) {
-    DBG_ERR("Malformed request detected.\n");
     return 1;
   }
   DBG_VERBOSE("Finished reading request.\n");
@@ -92,7 +91,7 @@ int  HttpRequest::read_meta() {
   start = buffer;
   end   = strstr(start, " ");
   if (!end) {
-    DBG_ERR("Cannot isolate HTTP verb: %s\n", buffer);
+    //DBG_ERR("Cannot isolate HTTP verb: %s\n", buffer);
     return 1;
   }
   verb  = strndup(start, end - start);
@@ -101,7 +100,7 @@ int  HttpRequest::read_meta() {
   start = end + 1;
   end   = EITHER(strstr(start, "?"), strstr(start, " "));
   if (!end) {
-    DBG_ERR("Cannot isolate HTTP path: %s\n", buffer);
+    //DBG_ERR("Cannot isolate HTTP path: %s\n", buffer);
     return 1;
   }
   path  = strndup(start, end - start);
@@ -111,7 +110,7 @@ int  HttpRequest::read_meta() {
     start = end + 1;
     end   = strstr(start, " ");
     if (!end) {
-      DBG_ERR("Cannot isolate HTTP query: %s\n", buffer);
+      //DBG_ERR("Cannot isolate HTTP query: %s\n", buffer);
       return 1;
     }
     query = strndup(start, end - start);
@@ -126,7 +125,7 @@ int  HttpRequest::read_meta() {
     start = buffer;
     end   = strstr(start, ":");
     if (!end) {
-      DBG_ERR("Malformed header: %s\n", buffer);
+      //DBG_ERR("Malformed header: %s\n", buffer);
       return 1;
     }
     key   = strndup(start, end - start);
@@ -155,7 +154,6 @@ int  HttpRequest::read_meta() {
 // ------------------------------------------------------------------------- //
 int  HttpRequest::read_body() {
   char  buffer[SZ_LINE_BUFFER];
-  char *start, *end;
 
   /* Save content length for later use */
   char *strLen      = headers["Content-Length"];

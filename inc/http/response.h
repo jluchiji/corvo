@@ -16,6 +16,7 @@ private:
 
 public:
   HttpRequest     *request;
+  bool             suppressLog;
   int              statusCode;
   const char      *statusMessage;
 
@@ -29,6 +30,8 @@ public:
   void write(const char*);
 
   void send();
+
+  size_t getContentLength();
 };
 
 #endif

@@ -11,6 +11,8 @@
 #include <netdb.h>
 #include <errno.h>
 #include <stdio.h>
+#include <time.h>
+#include <math.h>
 
 #include "middleware/base.h"
 #include "util/toregex.h"
@@ -156,17 +158,17 @@ HttpServer::panic(HttpRequest* request, HttpResponse* response) {
 
 void HttpServer::handle(HttpRequest *request) {
 
+  /* Start measuring response time */
+  clock_t begin = clock();
+
   /* Create the response object */
   HttpResponse *response = new HttpResponse(request);
   response -> setHeader(RES_POW); // Default header
 
-  /* Read request data and look for errors */
+  /* Read request data and discard invaid requests */
   if (request -> read()) {
-    // XXX Does this cause problems..?
-    //response -> setStatus(RES_400);
-    //response -> send();
-    //delete request;
-    //delete response;
+    delete request;
+    delete response;
     return;
   }
 
@@ -176,12 +178,22 @@ void HttpServer::handle(HttpRequest *request) {
   /* If handler was not found...that is a 405 */
   if (!handler) {
     response -> setStatus(RES_405);
-    request -> server -> redirect("*", "!!error/405", request, response);
-  } else {
+    request -> server -> panic(request, response);
+  }
+  else {
     handler -> handle(request, response);
   }
-
+  
   response -> send();
+
+  /* Log the request/response event; TODO utilize a more proper logger */
+  clock_t end = clock();
+
+  double responseTime = round(double(end - begin) / CLOCKS_PER_SEC);
+
+  printf("%s %s %d %d - %d ms\n", request -> verb, request -> path,
+    response -> statusCode, (int)response -> getContentLength(), (int)responseTime);
+
   delete request;
   delete response;
 }

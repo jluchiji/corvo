@@ -41,6 +41,7 @@ Static::serve_file(FileInfo *fi, HttpResponse *response) {
   while ((count = read(fd, buffer, SZ_LINE_BUFFER)) > 0) {
     response -> write(buffer, count);
   }
+  response -> setStatus(RES_200);
 }
 
 void
@@ -61,6 +62,7 @@ Static::serve_dir(FileInfo *fi, HttpResponse *response) {
   /* Render Response Page */
   Buffer result;
   render_dir(fi, &entries, &result);
+  response -> setStatus(RES_200);
   response -> write(result.data(), result.length());
 }
 
@@ -142,6 +144,4 @@ Static::handle(HttpRequest *request, HttpResponse *response) {
     } break;
 
   }
-
-  response -> setStatus(RES_200);
 }

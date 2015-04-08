@@ -18,6 +18,7 @@
 
 #include "trace.h"
 #include "io/path.h"
+#include "io/buffer.h"
 #include "puppet.h"
 #include "plumber.h"
 

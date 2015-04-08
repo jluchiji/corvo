@@ -15,8 +15,9 @@ HttpResponse::HttpResponse(HttpRequest *request) {
   this -> request = request;
   this -> setStatus(RES_501);
 
-  sent    = false;
-  buffer  = new Buffer();
+  sent        = false;
+  buffer      = new Buffer();
+  suppressLog = false;
 }
 
 HttpResponse::~HttpResponse() {
@@ -82,4 +83,9 @@ HttpResponse::send() {
   shutdown(sock, SHUT_WR);
   sent = true;
   close(sock);
+}
+
+size_t
+HttpResponse::getContentLength() {
+  return buffer -> length();
 }
