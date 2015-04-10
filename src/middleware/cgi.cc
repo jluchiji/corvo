@@ -2,6 +2,8 @@
 
 #include "process/puppet.h"
 #include "http/headers.h"
+#include "http/server.h"
+#include "io/fileinfo.h"
 #include "cgi.h"
 
 CGI::CGI(const char *root) {
@@ -17,6 +19,14 @@ CGI::handle(HttpRequest *request, HttpResponse *response) {
 
   Path *path = root -> clone() -> push(request -> path);
 
+  /* Detect file existence */
+  FileInfo fi(path);
+  if (!fi.exists()) {
+    response -> setStatus(RES_404);
+    request -> server -> panic(request, response);
+    return;
+  }
+
   /* Set environment variables as appropriate */
   setenv("REQUEST_METHOD", request -> verb, 1);
   setenv("QUERY_STRING", request -> query, 1);
@@ -31,7 +41,11 @@ CGI::handle(HttpRequest *request, HttpResponse *response) {
   puppet.run();
 
   /* Set up and send header information */
-  response -> setStatus(RES_200);
+  if (!strcmp(request -> verb, "POST")) {
+    response -> setStatus(RES_201);
+  }
+  else { response -> setStatus(RES_200); }
+
   response -> sendHeaders();
 
   /* Write puppet output to response socket */

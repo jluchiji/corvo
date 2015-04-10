@@ -7,6 +7,7 @@
 #include "trace.h"
 
 #include "middleware/redirect.h"
+#include "middleware/loadmod.h"
 #include "middleware/cgi.h"
 
 #include "error.h"
@@ -34,6 +35,7 @@ int main(int argc, char *argv[]) {
 
   server -> route("GET", "*",         new Serve("http-root-dir/htdocs"));
   server -> route("GET", "/cgi-bin/*",new CGI("http-root-dir"));
+  server -> route("*",   "/cgi-bin/*.so", new LoadMod("http-root-dir"));
   server -> route("*",   "!!error/*", new Error());
 
   server -> listen(9090);
