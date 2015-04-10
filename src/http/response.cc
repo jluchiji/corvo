@@ -101,6 +101,11 @@ HttpResponse::finalize() {
   close(sock);
 }
 
+void
+HttpResponse::disable() {
+  sent = true;
+}
+
 size_t
 HttpResponse::getContentLength() {
   return buffer -> length();

@@ -33,11 +33,14 @@ int main(int argc, char *argv[]) {
 
   HttpServer *server = new HttpServer(POOL);
 
-  server -> route("GET", "*",         new Serve("http-root-dir/htdocs"));
+  // Serve static files under `http-root-dir/htdocs` for any URL
+  server -> route("GET", "*", new Serve("http-root-dir/htdocs"));
+  // Serve GET requests to `/cgi-bin/...` using cgi-bin
   server -> route("GET", "/cgi-bin/*",new CGI("http-root-dir"));
+  // Serve ANY requests to `/cgi-bin/...` for files with .so extension
   server -> route("*",   "/cgi-bin/*.so", new LoadMod("http-root-dir"));
+  // For all errors, use fancy error pages instead of boring ones
   server -> route("*",   "!!error/*", new Error());
 
   server -> listen(9090);
-
 }

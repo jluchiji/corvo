@@ -33,6 +33,8 @@ public:
   void sendHeaders();
   void finalize();
 
+  void disable();
+
   size_t getContentLength();
 };
 

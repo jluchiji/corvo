@@ -15,7 +15,8 @@ MKDIR   = mkdir -p
 
 all: $(OUT)
 
-force: clean clean-res resources $(OUT)
+.PHONY: force
+force: clean clean-res clean-cgi resources cgi $(OUT)
 	@rm -rf $(TDIR)
 
 # --------------------------------------------------------------------------- #
@@ -84,17 +85,44 @@ $(TDIR)/%: $(RDIR)/%.svg
 	@$(MKDIR) tmp
 	@cp $^ $@
 
+# --------------------------------------------------------------------------- #
+# Build loadable modules.                                                     #
+# --------------------------------------------------------------------------- #
+
+CGI_SDIR = http-root-dir/cgi-src
+CGI_DDIR = http-root-dir/cgi-bin
+CGI_LIST = hello
+CGI_OBJS = $(patsubst %, $(CGI_DDIR)/%.so, $(CGI_LIST))
+
+.PHONY: cgi
+cgi: $(CGI_OBJS)
+
+$(CGI_DDIR)/%.so: $(CGI_SDIR)/%.cc
+	@printf "Compiling  %-25s" $(notdir $<)...
+	@$(CXX) $(CFLAGS) -shared -o $@ $<
+	@printf "\033[1;32mDone!\033[0m\n"
 
 # --------------------------------------------------------------------------- #
 # Cleanup.                                                                    #
 # --------------------------------------------------------------------------- #
 .PHONY: clean clean-res clean-deps
 clean-res:
+	@printf "Cleaning   %-25s" "resources"...
 	@rm -f $(RHDIR)/*.h
+	@printf "\033[1;32mDone!\033[0m\n"
 
 clean-deps:
+	@printf "Cleaning   %-25s" "dependencies"...
 	@rm -f .deps
+	@printf "\033[1;32mDone!\033[0m\n"
 
-clean: clean-deps
+clean-cgi:
+	@printf "Cleaning   %-25s" "cgi binaries"...
+	@rm -f $(CGI_DDIR)/*.so
+	@printf "\033[1;32mDone!\033[0m\n"
+
+clean: clean-deps clean-cgi
+	@printf "Cleaning   %-25s" "binaries"...
 	@rm -rf obj tmp
 	@rm -f httpd
+	@printf "\033[1;32mDone!\033[0m\n"

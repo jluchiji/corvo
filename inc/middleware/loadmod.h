@@ -2,7 +2,10 @@
 #define _LOADMOD_H_
 
 #include "io/path.h"
+#include "trace.h"
 #include "base.h"
+
+typedef void (*CgiInterface)(int, const char*);
 
 class LoadMod : public HttpMiddleware {
 private:

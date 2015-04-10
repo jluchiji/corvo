@@ -6,3 +6,4 @@ httpd
 obj
 tmp
 .deps
+*.dSYM
