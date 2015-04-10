@@ -30,6 +30,8 @@ public:
   void write(const char*);
 
   void send();
+  void sendHeaders();
+  void finalize();
 
   size_t getContentLength();
 };

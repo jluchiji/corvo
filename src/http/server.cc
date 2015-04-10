@@ -167,8 +167,6 @@ void HttpServer::handle(HttpRequest *request) {
 
   /* Read request data and discard invaid requests */
   if (request -> read()) {
-    delete request;
-    delete response;
     return;
   }
 
@@ -183,7 +181,7 @@ void HttpServer::handle(HttpRequest *request) {
   else {
     handler -> handle(request, response);
   }
-  
+
   response -> send();
 
   /* Log the request/response event; TODO utilize a more proper logger */

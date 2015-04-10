@@ -89,7 +89,7 @@ Puppet::write(const char *str) {
 // pipe after reading, but lseeks to the beginning. Blocks until the puppet  //
 // closes the pipe that is being read from.                                  //
 // ------------------------------------------------------------------------- //
-char*
+Buffer*
 Puppet::read(int type) {
 
   // Figure out which stream to read
@@ -97,28 +97,49 @@ Puppet::read(int type) {
   switch (type) {
     case IO_OUT: fd = opipe[0]; break;
     case IO_ERR: fd = epipe[0]; break;
-    default: COMPLAIN("puppet: read: bad stream type [%d]", type);
+    default:
+      COMPLAIN("puppet: read: bad stream type [%d]", type);
+      return NULL;
   }
 
   // Temporary buffer and std::string for dynamic growth
   char buffer[PUPPET_BUFFER_SIZE];
-  std::string *temp = new std::string();
+  Buffer *data = new Buffer(PUPPET_BUFFER_SIZE);
 
   // Read the entire buffer
   int count;
   while ((count = ::read(fd, buffer, PUPPET_BUFFER_SIZE))) {
-    temp -> append(buffer, count);
+    data -> write(buffer, count);
   }
 
   // Rewind so that it can be read again if needed
   // Output ends of output pipes are closed by destructor
   lseek(fd, 0, SEEK_SET);
 
-  // Convert to C string and delete temporary std::string
-  char *result = strdup(temp -> c_str());
-  delete temp;
+  return data;
+}
 
-  return result;
+// ------------------------------------------------------------------------- //
+// Reads contents of the puppet's stdout or stderr depending on the value    //
+// of the `type`. Possible values are IO_OUT or IO_ERR. Does not close pipe  //
+// after reading and does nothing to reset the position. May block until     //
+// the puppet closes the writing end of the pipe.                            //
+// ------------------------------------------------------------------------- //
+size_t
+Puppet::read(int type, char *buffer, size_t count) {
+
+  // Figure out which stream to read
+  int fd;
+  switch (type) {
+    case IO_OUT: fd = opipe[0]; break;
+    case IO_ERR: fd = epipe[0]; break;
+    default:
+      COMPLAIN("puppet: read: bad stream type [%d]", type);
+      return 0;
+  }
+
+  // Read and return
+  return ::read(fd, buffer, count);
 }
 
 // ------------------------------------------------------------------------- //

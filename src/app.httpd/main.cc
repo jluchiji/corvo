@@ -1,11 +1,13 @@
 #include <stdio.h>
 
+#include "process/puppet.h"
 #include "http/headers.h"
 #include "http/server.h"
 #include "http/mime.h"
 #include "trace.h"
 
 #include "middleware/redirect.h"
+#include "middleware/cgi.h"
 
 #include "error.h"
 #include "serve.h"
@@ -26,11 +28,12 @@ int main(int argc, char *argv[]) {
   DBG_VERBOSE_N(DGRAY("VERBOSE"));
   printf("\n\n");
 
+  Puppet::init(argv[0]);
+
   HttpServer *server = new HttpServer(POOL);
 
-  server -> route("GET", "*",         new Serve("http-root-dir"));
-  server -> route("*",   "/",         new Redirect("/htdocs/"));
-  server -> route("GET", "/cgi-bin/*",new Error(RES_501));
+  server -> route("GET", "*",         new Serve("http-root-dir/htdocs"));
+  server -> route("GET", "/cgi-bin/*",new CGI("http-root-dir"));
   server -> route("*",   "!!error/*", new Error());
 
   server -> listen(9090);

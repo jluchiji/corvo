@@ -57,15 +57,7 @@ HttpResponse::send() {
 
   int sock = request -> sock;
 
-  /* Write the metadata */
-  dprintf(sock, "HTTP/1.1 %d %s\r\n", statusCode, statusMessage);
-
-  /* Print headers */
-  for (StrMap::iterator it = headers.begin(); it != headers.end(); ++it) {
-    DBG_VERBOSE("%s: %s\n", it -> first, it -> second);
-    dprintf(sock, "%s: %s\r\n", it -> first, it -> second);
-    DBG_VERBOSE("%s: %s\n", it -> first, it -> second);
-  }
+  sendHeaders();
   DBG_VERBOSE("SEND RESPONSE\n");
 
   /* Add Content-Length if necessary */
@@ -78,6 +70,30 @@ HttpResponse::send() {
 
   /* Add body, if appropriate */
   ::write(sock, buffer -> data(), buffer -> length());
+
+  finalize();
+}
+
+void
+HttpResponse::sendHeaders() {
+  if (sent) { return; }
+
+  int sock = request -> sock;
+
+  /* Write the metadata */
+  dprintf(sock, "HTTP/1.1 %d %s\r\n", statusCode, statusMessage);
+
+  /* Print headers */
+  for (StrMap::iterator it = headers.begin(); it != headers.end(); ++it) {
+    DBG_VERBOSE("%s: %s\n", it -> first, it -> second);
+    dprintf(sock, "%s: %s\r\n", it -> first, it -> second);
+    DBG_VERBOSE("%s: %s\n", it -> first, it -> second);
+  }
+}
+
+void
+HttpResponse::finalize() {
+  int sock = request -> sock;
 
   /* Shutdown and close the socket */
   shutdown(sock, SHUT_WR);

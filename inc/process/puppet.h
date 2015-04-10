@@ -13,6 +13,8 @@
 #ifndef PUPPET_H_
 #define PUPPET_H_
 
+#include "io/buffer.h"
+#include "io/path.h"
 #include "plumber.h"
 
 // ------------------------------------------------------------------------- //
@@ -55,8 +57,10 @@ public:
   ~Puppet();                         // Destructor, cleans up the mess
 
   Puppet*        write(const char*); // Writes data to the puppet's stdin
-  char*          read(int);          // Reads entire content of puppet's stdout
+  Buffer*        read(int);          // Reads entire content of puppet's stdout
                                      // or stderr, depending on its parameter
+  size_t         read(int, char*,    // Reads the output to the specified
+                      size_t);       // character buffer.
   Puppet*        run();              // Executes the puppet program. Note that
                                      // after calling this function, all writes
                                      // to the puppet's stdin are disabled.

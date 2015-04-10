@@ -114,7 +114,7 @@ int  HttpRequest::read_meta() {
       return 1;
     }
     query = strndup(start, end - start);
-  } else { query = NULL; }
+  } else { query = strdup(""); }
 
   /* Read headers */
   while (IoUtil::readline(sock, buffer, SZ_LINE_BUFFER)) {
