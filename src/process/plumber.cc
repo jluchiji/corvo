@@ -93,7 +93,7 @@ Plumber::file(int type, int fd) {
 // ------------------------------------------------------------------------- //
 void
 Plumber::redirect(int i) {
-  DBG_INFO("Plubmer::apply(): %d\n", i);
+  //DBG_INFO("Plubmer::apply(): %d\n", i);
   dup2(_std[i], i);
   close(_std[i]);
 }

@@ -47,8 +47,6 @@ Puppet::Puppet(const char* exe) {
     executable = path -> resolve(Puppet::_root);
   }
 
-
-  DBG_INFO("Puppet::Puppet(): executable: %s\n", executable);
   delete path;
 
   // Create pipes
